@@ -1,32 +1,48 @@
-# RTS Asset Audit — May 14, 2026
-## Driftgate Studios — MARSHAL Review
+# RTS Archive Audit — May 14, 2026
+## MARSHAL — Driftgate Studios Studio President
 
-### Packs Audited
-- `RTS_Soviet_Buildings_Alpha_Ready.zip` — 11 assets
-- `RTS_Buildings_Alpha_Ready.zip` — 11 assets
+---
 
-### Summary
-- Total assets: 22
-- Alpha channel: ALL PASS (RGBA, corners transparent)
-- Semi-transparent px: 0% across all — hard edge cutouts (no anti-aliasing)
-- Resolution: All 1024x1024 ✅
-- Baked backgrounds: NONE DETECTED ✅
-- Magenta/green/white BG: NONE DETECTED ✅
+## REPOS CATALOGUED
 
-### Known Issues
-1. Zero semi-transparent pixels = hard cut edges (no anti-aliasing) — will look jagged at gameplay scale
-2. Large bottom clearance gaps on most assets (15–33% empty canvas below building)
-3. soviet_06_comms_facility has 0.4 aspect ratio — tall/narrow, possible front-facing
-4. Soviet palette is mostly grey/teal, not red-dominant — faction identity concern
-5. General pack buildings overlap heavily with Soviet in color/palette
-6. No damage variants, construction states, or snow variants
+| Repo | Files | Last Updated | Status |
+|---|---|---|---|
+| driftgate-rts | 88 | 2026-03-26 | MASTER ENGINE — canonical RTS core |
+| driftgate-rts-main | 1899 | 2026-04-14 | ARCHIVE HUB — patches, docs, experiments |
+| iron-curtain-rts | 163 | 2026-05-14 | LATEST — strategic war room UI, not playable |
+| trench-war-rts | 89 | 2026-03-16 | VOXEL experiment, limited |
+| vietnam-the-war-rts | 95 | 2026-03-16 | Origin of AI personalities, minimap |
+| warrts-era-of-conflict | ~90 | 2026-03-16 | Unknown detail |
+| war-rts | ~90 | 2026-03-16 | Unknown detail |
+| WARTS | 0 | 2025-12-17 | Empty/dead |
 
-### Folder Structure Recommendation
-/assets/rts/buildings/soviet/base/
-/assets/rts/buildings/soviet/damaged/
-/assets/rts/buildings/soviet/construction/
-/assets/rts/buildings/general/base/
-/assets/rts/units/
-/assets/rts/terrain/
-/assets/rts/effects/
-/assets/rts/ui/
+## CONFIRMED LIVE SYSTEMS (driftgate-rts)
+- GameLoop.js: 50hz fixed sim + RAF render — PRODUCTION READY
+- SelectionController.js: box select, click select, right-click, control groups — PRODUCTION READY
+- IsometricCamera.js: pan, zoom, world↔screen transforms — PRODUCTION READY
+- Pathfinder.js: A* 8-dir, octile heuristic, unit type exclusions — PRODUCTION READY
+- CombatResolver.js: armour table, AOE, garrison fire arcs — SOLID
+- HarvesterSystem.js: full state machine IDLE→ORE→REFINERY — COMPLETE
+- EnemyAIController.js: 3 personalities (aggressive/defensive/balanced) — COMPLETE
+- VeterancySystem.js: 4-tier kill tracking — COMPLETE
+- BuildSystem.js: structure placement, power, credits — LIVE
+- GarrisonSystem.js: enter/exit/mount logic — LIVE
+- SubterrainSystem.js: entrance/transit/emerge — LIVE
+- TrenchSystem.js: partially implemented
+- MissionDirector.js: exists
+- EventBus.js: pub/sub, zero dependencies — PRODUCTION READY
+- Full data layer: units, weapons, structures, missions, factions in JSON
+
+## ASSET AUDIT (May 14 2026)
+- 22 building sprites across Soviet + General packs
+- All RGBA true alpha, 1024x1024
+- 16/22 usable after tight crop
+- soviet_06_comms_facility: regenerate (wrong aspect)
+- building_05_sandbags: regenerate full emplacement
+- building_07_tech_center: move to Allied faction
+
+## NEXT ACTIONS
+1. Batch crop all 22 assets
+2. Lock iron-curtain-rts as master build or confirm driftgate-rts is the base
+3. First unit pass: Soviet conscript, tank, dog
+4. Camera/scale/shadow lock document
