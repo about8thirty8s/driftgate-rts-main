@@ -1,0 +1,19 @@
+{
+  "id": "r60_missile",
+  "displayName": "R-60 Atoll",
+  "category": "anti_air",
+  "projectile": "proj_r60",
+  "damage": 100,
+  "rateOfFire": 5.0,
+  "range": 12,
+  "accuracy": 0.70,
+  "isHoming": true,
+  "homingStrength": 0.75,
+  "flaresCanDecoy": true,
+  "tracerFX": "tracer_missile",
+  "muzzleFX": "muzzle_missile",
+  "impactFX": "explosion_air",
+  "audioOnFire": "sfx_missile_launch",
+  "bursts": 1,
+  "note": "Soviet short-range IR missile. Less range than AIM-7, but faster lock. Flares reduce hit by 60%."
+}

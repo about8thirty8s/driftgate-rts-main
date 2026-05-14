@@ -1,0 +1,17 @@
+{
+  "id": "gsh23_cannon",
+  "displayName": "GSh-23 Cannon",
+  "category": "anti_air",
+  "projectile": "proj_cannon_burst",
+  "damage": 35,
+  "rateOfFire": 0.12,
+  "range": 6,
+  "accuracy": 0.65,
+  "isHoming": false,
+  "tracerFX": "tracer_cannon",
+  "muzzleFX": "muzzle_cannon",
+  "impactFX": "explosion_small",
+  "audioOnFire": "sfx_cannon_burst",
+  "bursts": 3,
+  "note": "Close-range strafing cannon. Effective in close dogfights when missiles are expended. Low range — requires tight engagement."
+}
