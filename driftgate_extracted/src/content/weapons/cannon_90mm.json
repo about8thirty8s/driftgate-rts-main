@@ -1,0 +1,14 @@
+{
+  "id": "cannon_90mm",
+  "displayName": "90mm Main Gun",
+  "category": "cannon",
+  "projectile": "proj_90mm_shell",
+  "damage": 180,
+  "rateOfFire": 2.8,
+  "range": 9,
+  "accuracy": 0.92,
+  "tracerFX": "tracer_cannon",
+  "muzzleFX": "muzzle_cannon",
+  "impactFX": "explosion_medium",
+  "audioOnFire": "sfx_cannon_fire"
+}

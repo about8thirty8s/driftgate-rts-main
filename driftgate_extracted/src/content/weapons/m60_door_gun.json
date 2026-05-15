@@ -1,0 +1,17 @@
+{
+  "id": "m60_door_gun",
+  "displayName": "M60 Door Gun",
+  "category": "machine_gun",
+  "projectile": "proj_762mm",
+  "damage": 16,
+  "rateOfFire": 0.1,
+  "range": 8,
+  "accuracy": 0.72,
+  "tracerFX": "tracer_rifle",
+  "muzzleFX": "muzzle_rifle",
+  "impactFX": "impact_dirt",
+  "audioOnFire": "sfx_m60_fire",
+  "bursts": 6,
+  "burstInterval": 0.04,
+  "note": "Huey door gun. Can target both ground and low-altitude air units."
+}

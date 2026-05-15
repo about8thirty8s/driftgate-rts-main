@@ -1,0 +1,16 @@
+{
+  "id": "naval_yard",
+  "displayName": "Naval Yard",
+  "category": "production",
+  "cost": 1800,
+  "buildTime": 30,
+  "hp": 1200,
+  "armour": "medium",
+  "footprint": { "w": 3, "h": 3 },
+  "power": { "consumes": 40, "produces": 0 },
+  "produces": ["naval_patrol_boat"],
+  "requiresStructure": "war_factory",
+  "sprite": "structure_naval_yard",
+  "placementRules": ["requires_water_adjacent"],
+  "tags": ["production", "naval", "requires_water"]
+}

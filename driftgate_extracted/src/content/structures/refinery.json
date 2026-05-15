@@ -1,0 +1,18 @@
+{
+  "id": "refinery",
+  "displayName": "Mineral Refinery",
+  "category": "resource",
+  "footprint": { "w": 2, "h": 2 },
+  "cost": 600,
+  "buildTime": 20,
+  "hp": 600,
+  "armour": "structure",
+  "powerDraw": 1,
+  "powerGen": 0,
+  "produces": [],
+  "garrisonable": false,
+  "garrisonSlots": 0,
+  "tags": ["refinery"],
+  "description": "Processes raw alluvial ore into credits. Spawns a collector vehicle on completion.",
+  "colourHex": "#b08040"
+}

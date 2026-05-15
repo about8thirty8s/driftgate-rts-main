@@ -1,0 +1,101 @@
+{
+  "id": "broken_crossing",
+  "displayName": "Broken Crossing",
+  "mapFile": "broken_crossing",
+
+  "briefing": {
+    "slides": [
+      {
+        "portrait": "🪖",
+        "portraitLabel": "MAJOR COLE",
+        "title": "BROKEN CROSSING",
+        "subtitle": "Iron Front — Operation Verdant",
+        "body": "Intel confirms enemy forces have fortified the river crossing at grid 14-15. A garrisoned farmhouse overlooks the ford. They have armour. We don't — yet.",
+        "atmosphere": "dark"
+      },
+      {
+        "portrait": "🗺️",
+        "portraitLabel": "INTEL",
+        "title": "TERRAIN ASSESSMENT",
+        "subtitle": "River crossing — two approach vectors",
+        "body": "The ford is the only crossing point. Open ground — you'll take fire crossing it head-on. Our engineers found something else: a tunnel entrance south of the tree line. Unknown destination.",
+        "atmosphere": "dark"
+      },
+      {
+        "portrait": "🪖",
+        "portraitLabel": "MAJOR COLE",
+        "title": "YOUR ORDERS",
+        "subtitle": "Three objectives — in sequence",
+        "body": "Establish a defensive line on the south bank. Locate and use the tunnel to flank. Clear the farmhouse. Then hold the ford for thirty seconds against whatever they send back.",
+        "atmosphere": "dark"
+      }
+    ]
+  },
+
+  "victoryConditions": [
+    { "type": "structure_captured", "structureId": "farmhouse_A" },
+    { "type": "player_holds_zone", "zone": { "col": 15, "row": 15, "radius": 3 }, "duration": 30 }
+  ],
+
+  "defeatConditions": [
+    { "type": "all_units_dead", "faction": "player" },
+    { "type": "elapsed_time", "seconds": 600 }
+  ],
+
+  "phases": [
+    {
+      "id": "phase_1_establish",
+      "label": "Establish Foothold",
+      "trigger": { "type": "mission_start" },
+      "onEnter": {
+        "showObjective": "Advance to the defensive trench line. Dig in before pushing north.",
+        "spawnUnits": []
+      }
+    },
+    {
+      "id": "phase_2_contact",
+      "label": "First Contact",
+      "trigger": { "type": "unit_reaches_tile", "col": 15, "row": 20 },
+      "onEnter": {
+        "showObjective": "Enemy patrol spotted. Farmhouse strongpoint controls the ford.",
+        "spawnUnits": [
+          { "defId": "infantry_rifleman", "faction": "enemy", "col": 15, "row": 12, "count": 2 }
+        ]
+      }
+    },
+    {
+      "id": "phase_3_tunnel",
+      "label": "Find the Route",
+      "trigger": { "type": "elapsed_time", "seconds": 25 },
+      "onEnter": {
+        "showObjective": "Engineers report a tunnel entrance nearby. Use it to flank the farmhouse.",
+        "revealSubterrainEntrance": "tunnel_south_A"
+      }
+    },
+    {
+      "id": "phase_4_assault",
+      "label": "Assault the Strongpoint",
+      "trigger": { "type": "unit_reaches_tile", "col": 13, "row": 9 },
+      "onEnter": {
+        "showObjective": "Clear the farmhouse. Evict or destroy the enemy garrison.",
+        "spawnUnits": [
+          { "defId": "infantry_rifleman", "faction": "enemy", "col": 18, "row": 10, "count": 3 },
+          { "defId": "tank_medium",       "faction": "enemy", "col": 17, "row": 8,  "count": 1 }
+        ]
+      }
+    },
+    {
+      "id": "phase_5_hold",
+      "label": "Hold the Crossing",
+      "trigger": { "type": "structure_captured", "structureId": "farmhouse_A" },
+      "onEnter": {
+        "showObjective": "Counterattack inbound. Hold the ford for 30 seconds.",
+        "spawnUnits": [
+          { "defId": "infantry_rifleman", "faction": "enemy", "col": 15, "row": 3,  "count": 4 },
+          { "defId": "infantry_rifleman", "faction": "enemy", "col": 12, "row": 4,  "count": 2 },
+          { "defId": "tank_medium",       "faction": "enemy", "col": 14, "row": 3,  "count": 1 }
+        ]
+      }
+    }
+  ]
+}

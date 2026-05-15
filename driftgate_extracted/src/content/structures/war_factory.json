@@ -1,0 +1,18 @@
+{
+  "id": "war_factory",
+  "displayName": "War Factory",
+  "category": "production",
+  "cost": 800,
+  "buildTime": 20,
+  "hp": 700,
+  "armour": "structure",
+  "powerDraw": 20,
+  "powerGen": 0,
+  "footprint": { "w": 4, "h": 3 },
+  "produces": ["tank_medium", "helicopter_attack"],
+  "sprite": "structure_war_factory",
+  "maxQueueSize": 3,
+  "damageLevels": [0.6, 0.3],
+  "smokeOnDamage": true,
+  "placementRules": ["not_water", "not_cliff", "not_resource"]
+}

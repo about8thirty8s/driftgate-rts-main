@@ -1,0 +1,23 @@
+{
+  "id": "helicopter_attack",
+  "faction": "any",
+  "displayName": "Attack Helicopter",
+  "category": "air",
+  "cost": 1200,
+  "buildTime": 18,
+  "requiredStructure": "airpad",
+  "hp": 220,
+  "armour": "light",
+  "speed": 4.0,
+  "visionRadius": 8,
+  "canEnterTrench": false,
+  "canGarrison": false,
+  "isAir": true,
+  "weapons": ["minigun_20mm", "rocket_pod"],
+  "sprite": "helicopter_attack",
+  "portraitId": "portrait_heli",
+  "voiceSet": "voice_air",
+  "selectionRadius": 0.9,
+  "crushable": false,
+  "tags": ["air", "light", "anti_ground"]
+}

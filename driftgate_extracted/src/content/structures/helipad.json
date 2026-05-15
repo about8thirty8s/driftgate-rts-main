@@ -1,0 +1,16 @@
+{
+  "id": "helipad",
+  "displayName": "Helipad",
+  "category": "production",
+  "cost": 1500,
+  "buildTime": 20,
+  "hp": 400,
+  "armour": "light",
+  "footprint": { "w": 2, "h": 2 },
+  "power": { "consumes": 30, "produces": 0 },
+  "produces": ["air_huey"],
+  "requiresStructure": "war_factory",
+  "sprite": "structure_helipad",
+  "placementRules": ["surface_only", "not_water"],
+  "tags": ["production", "air", "helipad"]
+}

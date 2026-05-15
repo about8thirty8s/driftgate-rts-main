@@ -1,0 +1,16 @@
+{
+  "id": "airfield",
+  "displayName": "Airfield",
+  "category": "production",
+  "cost": 3000,
+  "buildTime": 40,
+  "hp": 1200,
+  "armour": "medium",
+  "footprint": { "w": 4, "h": 3 },
+  "power": { "consumes": 80, "produces": 0 },
+  "produces": ["air_f4_phantom", "air_b52"],
+  "requiresStructure": "helipad",
+  "sprite": "structure_airfield",
+  "placementRules": ["surface_only", "not_water", "flat_terrain"],
+  "tags": ["production", "air", "strategic"]
+}

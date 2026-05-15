@@ -1,0 +1,36 @@
+{
+  "id": "infantry_engineer",
+  "faction": "any",
+  "displayName": "Engineer",
+  "category": "infantry",
+  "cost": 300,
+  "buildTime": 8,
+  "requiredStructure": "barracks",
+  "hp": 75,
+  "armour": "light",
+  "speed": 1.8,
+  "visionRadius": 5,
+  "canEnterTrench": true,
+  "canGarrison": false,
+  "canCapture": true,
+  "canBuild": true,
+  "canRepair": true,
+  "weapons": [
+    "pistol_m1911"
+  ],
+  "sprite": "infantry_engineer",
+  "portraitId": "portrait_engineer",
+  "voiceSet": "voice_infantry",
+  "selectionRadius": 0.5,
+  "crushable": true,
+  "tags": [
+    "infantry",
+    "light",
+    "can_capture",
+    "engineer"
+  ],
+  "allowedLayers": [
+    "surface",
+    "subterrain"
+  ]
+}

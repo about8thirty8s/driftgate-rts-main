@@ -1,0 +1,58 @@
+{
+  "id": "campaign_03_mechanized_assault",
+  "name": "Mechanised Assault",
+  "description": "Build a mechanised strike force and punch through the NVA's fortified lines.",
+  "difficulty": "medium",
+  "aiPersonality": "defensive",
+  "startingResources": 6000,
+
+  "startingUnits": [
+    { "defId": "infantry_rifleman", "col": 20, "row": 20 },
+    { "defId": "infantry_rifleman", "col": 21, "row": 20 },
+    { "defId": "infantry_rifleman", "col": 22, "row": 20 },
+    { "defId": "vehicle_m113",      "col": 20, "row": 23 }
+  ],
+  "startingBuildings": [
+    { "defId": "command_hq",   "col": 18, "row": 26 },
+    { "defId": "power_plant",  "col": 22, "row": 27 },
+    { "defId": "barracks",     "col": 26, "row": 27 },
+    { "defId": "refinery",     "col": 18, "row": 30 }
+  ],
+
+  "phases": [
+    {
+      "id": "phase_start",
+      "trigger": "mission_start",
+      "objective": "Build 3 M48 Patton tanks.",
+      "actions": []
+    },
+    {
+      "id": "phase_push",
+      "trigger": { "type": "unit_count", "faction": "player", "unit": "vehicle_m48_tank", "count": 3 },
+      "objective": "Destroy the enemy War Factory and all enemy buildings.",
+      "actions": []
+    }
+  ],
+
+  "victoryConditions": [
+    { "type": "destroy_all_enemy_structures" }
+  ],
+  "defeatConditions": [
+    { "type": "destroy_structure", "defId": "command_hq", "faction": "player" }
+  ],
+
+  "enemySetup": {
+    "startCredits": 4000,
+    "personality": "defensive",
+    "startingUnits": [
+      { "defId": "infantry_vietcong", "col": 60, "row": 20 },
+      { "defId": "vehicle_m48_tank",  "col": 62, "row": 23 }
+    ],
+    "startingBuildings": [
+      { "defId": "command_hq",   "col": 65, "row": 26 },
+      { "defId": "barracks",     "col": 68, "row": 26 },
+      { "defId": "war_factory",  "col": 65, "row": 30 },
+      { "defId": "power_plant",  "col": 72, "row": 26 }
+    ]
+  }
+}

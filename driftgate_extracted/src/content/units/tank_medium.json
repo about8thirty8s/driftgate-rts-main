@@ -1,0 +1,23 @@
+{
+  "id": "tank_medium",
+  "faction": "any",
+  "displayName": "Medium Tank",
+  "category": "vehicle",
+  "cost": 800,
+  "buildTime": 14,
+  "requiredStructure": "war_factory",
+  "hp": 400,
+  "armour": "heavy",
+  "speed": 1.8,
+  "visionRadius": 5,
+  "canEnterTrench": false,
+  "canGarrison": false,
+  "weapons": ["cannon_90mm"],
+  "sprite": "tank_medium",
+  "portraitId": "portrait_tank",
+  "voiceSet": "voice_vehicle",
+  "selectionRadius": 0.8,
+  "crushable": false,
+  "crushesInfantry": true,
+  "tags": ["vehicle", "heavy", "tracked"]
+}

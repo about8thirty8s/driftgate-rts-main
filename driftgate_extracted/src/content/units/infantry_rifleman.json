@@ -1,0 +1,37 @@
+{
+  "id": "infantry_rifleman",
+  "faction": "any",
+  "displayName": "Rifleman",
+  "category": "infantry",
+  "cost": 200,
+  "buildTime": 5,
+  "requiredStructure": "barracks",
+  "hp": 100,
+  "armour": "light",
+  "speed": 2.2,
+  "visionRadius": 6,
+  "canEnterTrench": true,
+  "canGarrison": true,
+  "weapons": [
+    "rifle_m16"
+  ],
+  "sprite": "infantry_rifleman",
+  "portraitId": "portrait_rifleman",
+  "voiceSet": "voice_infantry",
+  "selectionRadius": 0.5,
+  "crushable": true,
+  "veterancyThresholds": [
+    3,
+    8,
+    15
+  ],
+  "tags": [
+    "infantry",
+    "light",
+    "can_capture"
+  ],
+  "allowedLayers": [
+    "surface",
+    "subterrain"
+  ]
+}

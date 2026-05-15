@@ -1,0 +1,10 @@
+{
+  "id": "proj_556mm",
+  "displayName": "5.56mm Round",
+  "damage": 12,
+  "aoeRadius": 0,
+  "aoeFalloff": "none",
+  "impactFX": "impact_dirt",
+  "goreOnInfantryKill": false,
+  "screenShake": { "intensity": 0.0, "duration": 0.0 }
+}

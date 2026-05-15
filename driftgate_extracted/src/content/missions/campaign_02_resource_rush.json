@@ -1,0 +1,62 @@
+{
+  "id": "campaign_02_resource_rush",
+  "name": "Resource Rush",
+  "description": "Secure the ore fields along the Mekong and accumulate supplies while defending against enemy raids.",
+  "difficulty": "easy",
+  "aiPersonality": "balanced",
+  "startingResources": 4000,
+
+  "startingUnits": [
+    { "defId": "infantry_rifleman",  "col": 20, "row": 20 },
+    { "defId": "infantry_rifleman",  "col": 21, "row": 20 },
+    { "defId": "harvester_vehicle",  "col": 19, "row": 22 }
+  ],
+  "startingBuildings": [
+    { "defId": "command_hq",  "col": 18, "row": 23 },
+    { "defId": "power_plant", "col": 22, "row": 24 },
+    { "defId": "refinery",    "col": 18, "row": 27 }
+  ],
+
+  "phases": [
+    {
+      "id": "phase_start",
+      "trigger": "mission_start",
+      "objective": "Collect 5000 resources and build a War Factory.",
+      "actions": []
+    },
+    {
+      "id": "phase_raid",
+      "trigger": { "type": "time_elapsed", "seconds": 120 },
+      "objective": "Survive the enemy raid. Collect 5000 resources and build a War Factory.",
+      "actions": [
+        { "type": "spawn_enemy_wave", "units": [
+          { "defId": "infantry_vietcong", "col": 58, "row": 20 },
+          { "defId": "infantry_vietcong", "col": 59, "row": 22 },
+          { "defId": "infantry_vietcong", "col": 57, "row": 24 }
+        ]}
+      ]
+    }
+  ],
+
+  "victoryConditions": [
+    { "type": "resources_collected", "amount": 5000 },
+    { "type": "structure_built", "defId": "war_factory" }
+  ],
+  "defeatConditions": [
+    { "type": "destroy_structure", "defId": "command_hq", "faction": "player" }
+  ],
+
+  "enemySetup": {
+    "startCredits": 2500,
+    "personality": "balanced",
+    "startingUnits": [
+      { "defId": "infantry_vietcong", "col": 60, "row": 20 },
+      { "defId": "infantry_vietcong", "col": 62, "row": 20 }
+    ],
+    "startingBuildings": [
+      { "defId": "command_hq",  "col": 65, "row": 25 },
+      { "defId": "power_plant", "col": 68, "row": 25 },
+      { "defId": "barracks",    "col": 65, "row": 28 }
+    ]
+  }
+}

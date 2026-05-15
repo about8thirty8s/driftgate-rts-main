@@ -1,0 +1,17 @@
+{
+  "id": "m2_browning",
+  "displayName": ".50 Cal Browning",
+  "category": "heavy_machine_gun",
+  "projectile": "proj_50cal",
+  "damage": 30,
+  "rateOfFire": 0.12,
+  "range": 11,
+  "accuracy": 0.82,
+  "tracerFX": "tracer_heavy",
+  "muzzleFX": "muzzle_heavy",
+  "impactFX": "impact_metal",
+  "audioOnFire": "sfx_m2_fire",
+  "bursts": 4,
+  "burstInterval": 0.05,
+  "armorPiercing": 0.3
+}

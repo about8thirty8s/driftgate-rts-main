@@ -1,0 +1,18 @@
+{
+  "id": "power_plant",
+  "displayName": "Power Plant",
+  "category": "power",
+  "cost": 300,
+  "buildTime": 10,
+  "hp": 400,
+  "armour": "structure",
+  "powerDraw": 0,
+  "powerGen": 50,
+  "footprint": { "w": 2, "h": 2 },
+  "produces": [],
+  "sprite": "structure_power",
+  "damageLevels": [0.5, 0.2],
+  "smokeOnDamage": true,
+  "flashOnCritical": true,
+  "placementRules": ["not_water", "not_cliff"]
+}

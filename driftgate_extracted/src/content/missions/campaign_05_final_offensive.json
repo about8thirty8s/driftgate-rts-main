@@ -1,0 +1,78 @@
+{
+  "id": "campaign_05_final_offensive",
+  "name": "Final Offensive",
+  "description": "The NVA have dug in deep. This is the decisive engagement — defeat their fully armed base with every asset at your disposal.",
+  "difficulty": "hard",
+  "aiPersonality": "aggressive",
+  "startingResources": 10000,
+
+  "startingUnits": [
+    { "defId": "infantry_rifleman",  "col": 20, "row": 20 },
+    { "defId": "infantry_rifleman",  "col": 21, "row": 20 },
+    { "defId": "infantry_rifleman",  "col": 22, "row": 20 },
+    { "defId": "vehicle_m48_tank",   "col": 20, "row": 23 },
+    { "defId": "vehicle_m48_tank",   "col": 22, "row": 23 },
+    { "defId": "vehicle_m113",       "col": 24, "row": 23 },
+    { "defId": "harvester_vehicle",  "col": 18, "row": 26 }
+  ],
+  "startingBuildings": [
+    { "defId": "command_hq",   "col": 18, "row": 29 },
+    { "defId": "power_plant",  "col": 22, "row": 30 },
+    { "defId": "power_plant",  "col": 26, "row": 30 },
+    { "defId": "barracks",     "col": 18, "row": 34 },
+    { "defId": "war_factory",  "col": 22, "row": 34 },
+    { "defId": "refinery",     "col": 18, "row": 38 }
+  ],
+
+  "phases": [
+    {
+      "id": "phase_start",
+      "trigger": "mission_start",
+      "objective": "Build an Airfield and destroy the enemy Command HQ.",
+      "actions": []
+    },
+    {
+      "id": "phase_final_push",
+      "trigger": { "type": "structure_built", "defId": "airfield" },
+      "objective": "Eliminate all enemy forces and structures.",
+      "actions": [
+        { "type": "spawn_enemy_wave", "units": [
+          { "defId": "infantry_vietcong", "col": 60, "row": 18 },
+          { "defId": "infantry_vietcong", "col": 61, "row": 20 },
+          { "defId": "vehicle_m48_tank",  "col": 63, "row": 22 }
+        ]}
+      ]
+    }
+  ],
+
+  "victoryConditions": [
+    { "type": "destroy_structure", "defId": "command_hq", "faction": "enemy" },
+    { "type": "destroy_all_enemy_structures" },
+    { "type": "destroy_all_enemies" }
+  ],
+  "defeatConditions": [
+    { "type": "destroy_structure", "defId": "command_hq", "faction": "player" }
+  ],
+
+  "enemySetup": {
+    "startCredits": 8000,
+    "personality": "aggressive",
+    "startingUnits": [
+      { "defId": "infantry_vietcong", "col": 60, "row": 20 },
+      { "defId": "infantry_vietcong", "col": 62, "row": 20 },
+      { "defId": "vehicle_m48_tank",  "col": 60, "row": 23 },
+      { "defId": "vehicle_m113",      "col": 65, "row": 23 }
+    ],
+    "startingBuildings": [
+      { "defId": "command_hq",   "col": 65, "row": 26 },
+      { "defId": "barracks",     "col": 68, "row": 26 },
+      { "defId": "barracks",     "col": 72, "row": 26 },
+      { "defId": "war_factory",  "col": 65, "row": 30 },
+      { "defId": "war_factory",  "col": 70, "row": 30 },
+      { "defId": "power_plant",  "col": 76, "row": 26 },
+      { "defId": "power_plant",  "col": 76, "row": 30 },
+      { "defId": "radar",        "col": 72, "row": 30 },
+      { "defId": "refinery",     "col": 65, "row": 34 }
+    ]
+  }
+}

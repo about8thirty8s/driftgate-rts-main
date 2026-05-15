@@ -1,0 +1,18 @@
+{
+  "id": "oil_derrick",
+  "displayName": "Oil Derrick",
+  "category": "resource",
+  "footprint": { "w": 1, "h": 1 },
+  "cost": 0,
+  "buildTime": 0,
+  "hp": 300,
+  "armour": "structure",
+  "powerDraw": 0,
+  "powerGen": 0,
+  "produces": [],
+  "garrisonable": false,
+  "garrisonSlots": 0,
+  "tags": ["capturable", "oil_derrick"],
+  "description": "Neutral oil derrick. Capture with an engineer to earn passive income. Generates 4 credits/sec when owned.",
+  "colourHex": "#3a3a3a"
+}

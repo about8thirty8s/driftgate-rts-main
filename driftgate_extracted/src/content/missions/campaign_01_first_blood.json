@@ -1,0 +1,58 @@
+{
+  "id": "campaign_01_first_blood",
+  "name": "First Blood",
+  "description": "Establish a forward base and eliminate a small Viet Cong cell before they can reinforce.",
+  "difficulty": "easy",
+  "aiPersonality": "defensive",
+  "startingResources": 3000,
+
+  "startingUnits": [
+    { "defId": "infantry_rifleman", "col": 20, "row": 20 },
+    { "defId": "infantry_rifleman", "col": 21, "row": 20 },
+    { "defId": "infantry_rifleman", "col": 22, "row": 20 },
+    { "defId": "infantry_rifleman", "col": 23, "row": 20 }
+  ],
+  "startingBuildings": [
+    { "defId": "command_hq",   "col": 18, "row": 23 },
+    { "defId": "power_plant",  "col": 22, "row": 24 }
+  ],
+
+  "phases": [
+    {
+      "id": "phase_start",
+      "trigger": "mission_start",
+      "objective": "Build a Barracks and train 5 Marines.",
+      "actions": []
+    },
+    {
+      "id": "phase_assault",
+      "trigger": { "type": "unit_count", "faction": "player", "unit": "infantry_rifleman", "count": 5 },
+      "objective": "Destroy all enemy forces.",
+      "actions": [
+        { "type": "spawn_enemy_wave", "units": [
+          { "defId": "infantry_vietcong", "col": 55, "row": 20 },
+          { "defId": "infantry_vietcong", "col": 56, "row": 21 }
+        ]}
+      ]
+    }
+  ],
+
+  "victoryConditions": [
+    { "type": "destroy_all_enemies" }
+  ],
+  "defeatConditions": [
+    { "type": "destroy_structure", "defId": "command_hq", "faction": "player" }
+  ],
+
+  "enemySetup": {
+    "startCredits": 1500,
+    "personality": "defensive",
+    "startingUnits": [
+      { "defId": "infantry_vietcong", "col": 58, "row": 22 }
+    ],
+    "startingBuildings": [
+      { "defId": "command_hq", "col": 60, "row": 25 },
+      { "defId": "barracks",   "col": 58, "row": 28 }
+    ]
+  }
+}

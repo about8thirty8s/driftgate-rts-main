@@ -1,0 +1,16 @@
+{
+  "id": "rifle_ak47",
+  "displayName": "AK-47",
+  "category": "small_arms",
+  "projectile": "proj_762mm",
+  "damage": 13,
+  "rateOfFire": 0.2,
+  "range": 6,
+  "accuracy": 0.80,
+  "tracerFX": "tracer_rifle",
+  "muzzleFX": "muzzle_rifle",
+  "impactFX": "impact_dirt",
+  "audioOnFire": "sfx_ak47_fire",
+  "bursts": 3,
+  "burstInterval": 0.06
+}

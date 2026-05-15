@@ -1,0 +1,18 @@
+{
+  "id": "barracks",
+  "displayName": "Barracks",
+  "category": "production",
+  "cost": 500,
+  "buildTime": 15,
+  "hp": 600,
+  "armour": "structure",
+  "powerDraw": 10,
+  "powerGen": 0,
+  "footprint": { "w": 3, "h": 2 },
+  "produces": ["infantry_rifleman", "infantry_grenadier", "infantry_engineer"],
+  "sprite": "structure_barracks",
+  "maxQueueSize": 5,
+  "damageLevels": [0.6, 0.3],
+  "smokeOnDamage": true,
+  "placementRules": ["not_water", "not_cliff", "not_resource"]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "aim7_sparrow",
+  "displayName": "AIM-7 Sparrow",
+  "category": "anti_air",
+  "projectile": "proj_aim7",
+  "damage": 120,
+  "rateOfFire": 5.0,
+  "range": 16,
+  "accuracy": 0.75,
+  "isHoming": true,
+  "homingStrength": 0.85,
+  "flaresCanDecoy": true,
+  "tracerFX": "tracer_missile",
+  "muzzleFX": "muzzle_missile",
+  "impactFX": "explosion_air",
+  "audioOnFire": "sfx_missile_launch",
+  "bursts": 1,
+  "note": "Air-to-air homing missile. Flares reduce hit chance by 70%. Triggers evasion on launch detection."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "radar",
+  "displayName": "Radar Station",
+  "category": "support",
+  "cost": 1000,
+  "buildTime": 20,
+  "hp": 500,
+  "armour": "light",
+  "footprint": { "w": 2, "h": 2 },
+  "power": { "consumes": 40, "produces": 0 },
+  "produces": [],
+  "requiresStructure": "power_plant",
+  "visionBonus": 6,
+  "revealsEntireMap": false,
+  "sprite": "structure_radar",
+  "placementRules": ["surface_only", "not_water"],
+  "tags": ["support", "vision", "intel"]
+}

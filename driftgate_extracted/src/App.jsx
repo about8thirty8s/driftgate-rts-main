@@ -1,14 +1,12 @@
-import './App.css'
-import Pages from "@/pages/index.jsx"
-import { Toaster } from "@/components/ui/toaster"
+import React, { useState } from 'react';
+import MainMenu from './pages/MainMenu.jsx';
+import Game     from './pages/Game.jsx';
+import Mission  from './pages/Mission.jsx';
 
-function App() {
-  return (
-    <>
-      <Pages />
-      <Toaster />
-    </>
-  )
+export default function App() {
+  const [scene, setScene] = useState('menu');
+
+  if (scene === 'game')    return <Game    onExit={() => setScene('menu')} />;
+  if (scene === 'mission') return <Mission onExit={() => setScene('menu')} />;
+  return <MainMenu onStartGame={() => setScene('game')} onStartMission={() => setScene('mission')} />;
 }
-
-export default App 

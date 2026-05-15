@@ -1,0 +1,26 @@
+{
+  "id": "farmhouse",
+  "displayName": "Farmhouse",
+  "category": "farmhouse",
+  "cost": 0,
+  "buildTime": 0,
+  "hp": 600,
+  "armour": "structure",
+  "powerDraw": 0,
+  "powerGen": 0,
+  "footprint": { "w": 3, "h": 3 },
+  "produces": [],
+  "garrisonable": true,
+  "garrisonSlots": 4,
+  "mountPoints": [
+    { "x": 0.5, "y": 1.5, "facing": 6 },
+    { "x": 2.5, "y": 1.5, "facing": 2 },
+    { "x": 1.5, "y": 0.5, "facing": 0 },
+    { "x": 1.5, "y": 2.5, "facing": 4 }
+  ],
+  "damageLevels": [0.5, 0.25],
+  "smokeOnDamage": true,
+  "vulnerableTo": ["artillery", "flame", "demolition"],
+  "placementRules": ["not_water", "not_cliff"],
+  "maxQueueSize": 0
+}

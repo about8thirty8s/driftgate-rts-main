@@ -1,0 +1,24 @@
+{
+  "id": "pill_box",
+  "displayName": "Pill Box",
+  "category": "defense",
+  "cost": 300,
+  "buildTime": 8,
+  "hp": 400,
+  "armour": "structure",
+  "powerDraw": 0,
+  "powerGen": 0,
+  "footprint": { "w": 2, "h": 2 },
+  "produces": [],
+  "garrisonable": true,
+  "garrisonSlots": 2,
+  "mountPoints": [
+    { "x": 0.5, "y": 0.0, "facing": 0 },
+    { "x": 1.5, "y": 1.5, "facing": 4 }
+  ],
+  "sprite": "structure_pill_box",
+  "maxQueueSize": 0,
+  "damageLevels": [0.5, 0.25],
+  "smokeOnDamage": true,
+  "placementRules": ["not_water", "not_cliff"]
+}

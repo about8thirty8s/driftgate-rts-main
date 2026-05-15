@@ -1,0 +1,20 @@
+{
+  "id": "command_hq",
+  "displayName": "Command HQ",
+  "category": "hq",
+  "cost": 0,
+  "buildTime": 0,
+  "hp": 1000,
+  "armour": "structure",
+  "powerDraw": 0,
+  "powerGen": 0,
+  "footprint": { "w": 3, "h": 3 },
+  "produces": ["infantry_engineer"],
+  "weapons": [],
+  "sprite": "structure_hq",
+  "maxQueueSize": 2,
+  "isWinCondition": true,
+  "damageLevels": [0.6, 0.3],
+  "smokeOnDamage": true,
+  "placementRules": ["not_water", "not_cliff"]
+}

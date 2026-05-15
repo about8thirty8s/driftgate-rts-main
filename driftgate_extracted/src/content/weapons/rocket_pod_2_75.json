@@ -1,0 +1,16 @@
+{
+  "id": "rocket_pod_2_75",
+  "displayName": "2.75\" Rocket Pod",
+  "category": "rocket",
+  "projectile": "proj_2_75_rocket",
+  "damage": 70,
+  "rateOfFire": 0.4,
+  "range": 12,
+  "accuracy": 0.70,
+  "aoeRadius": 3.0,
+  "tracerFX": "tracer_rocket",
+  "muzzleFX": "muzzle_rocket",
+  "impactFX": "explosion_medium",
+  "audioOnFire": "sfx_rocket_fire",
+  "bursts": 1
+}

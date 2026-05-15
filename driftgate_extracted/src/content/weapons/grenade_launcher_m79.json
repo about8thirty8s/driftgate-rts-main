@@ -1,0 +1,16 @@
+{
+  "id": "grenade_launcher_m79",
+  "displayName": "M79 Grenade Launcher",
+  "category": "grenade",
+  "projectile": "proj_40mm_grenade",
+  "damage": 55,
+  "rateOfFire": 0.5,
+  "range": 10,
+  "accuracy": 0.75,
+  "aoeRadius": 2.5,
+  "tracerFX": "tracer_grenade",
+  "muzzleFX": "muzzle_thump",
+  "impactFX": "explosion_small",
+  "audioOnFire": "sfx_m79_fire",
+  "bursts": 1
+}

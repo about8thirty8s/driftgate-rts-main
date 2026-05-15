@@ -1,0 +1,26 @@
+{
+  "id": "iron_front",
+  "displayName": "Iron Front",
+  "description": "A disciplined mechanised force built for industrial-scale jungle warfare. Heavy armour, air superiority, overwhelming firepower.",
+  "teamColour": "#3a9a4a",
+  "accentColour": "#c8a020",
+  "strengths": ["heavy_armour", "air_power", "fortified_defence"],
+  "weaknesses": ["slow_expansion", "high_power_demand"],
+  "units": [
+    "infantry_rifleman",
+    "infantry_engineer",
+    "tank_medium",
+    "helicopter_attack"
+  ],
+  "structures": [
+    "command_hq",
+    "power_plant",
+    "barracks",
+    "war_factory"
+  ],
+  "powers": ["power_airstrike_napalm"],
+  "portraitPack": "portraits_iron_front",
+  "musicTheme": "music_iron_front",
+  "sfxPack": "sfx_iron_front",
+  "buildOrder": ["power_plant", "barracks", "power_plant", "war_factory"]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "m60_machinegun",
+  "displayName": "M60 Machine Gun",
+  "category": "machine_gun",
+  "projectile": "proj_762mm",
+  "damage": 18,
+  "rateOfFire": 0.1,
+  "range": 9,
+  "accuracy": 0.78,
+  "tracerFX": "tracer_rifle",
+  "muzzleFX": "muzzle_rifle",
+  "impactFX": "impact_dirt",
+  "audioOnFire": "sfx_m60_fire",
+  "bursts": 5,
+  "burstInterval": 0.04
+}

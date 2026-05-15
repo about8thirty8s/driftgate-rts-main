@@ -1,0 +1,16 @@
+{
+  "id": "proj_90mm_shell",
+  "speed": 20,
+  "gravity": 0.0,
+  "aoeRadius": 1.8,
+  "aoeFalloff": "linear",
+  "damage": 180,
+  "craterOnImpact": true,
+  "craterRadius": 1.0,
+  "goreOnInfantryKill": true,
+  "impactFX": "explosion_medium",
+  "debrisFX": "debris_dirt_medium",
+  "smokeFX": "smoke_post_impact",
+  "explosionSize": "medium",
+  "screenShake": { "intensity": 0.5, "duration": 0.3 }
+}

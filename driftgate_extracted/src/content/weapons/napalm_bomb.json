@@ -1,0 +1,19 @@
+{
+  "id": "napalm_bomb",
+  "displayName": "Napalm Canister",
+  "category": "bomb",
+  "projectile": "proj_napalm",
+  "damage": 40,
+  "rateOfFire": 99,
+  "range": 14,
+  "accuracy": 0.65,
+  "aoeRadius": 5.0,
+  "burnDuration": 6.0,
+  "burnDamagePerSec": 8,
+  "tracerFX": "tracer_bomb",
+  "muzzleFX": null,
+  "impactFX": "explosion_napalm",
+  "audioOnFire": "sfx_napalm_drop",
+  "bursts": 1,
+  "note": "Lays persistent burn zone on impact. burnDuration seconds of DOT."
+}

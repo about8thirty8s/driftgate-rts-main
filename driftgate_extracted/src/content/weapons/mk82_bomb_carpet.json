@@ -1,0 +1,19 @@
+{
+  "id": "mk82_bomb_carpet",
+  "displayName": "Mk 82 Carpet Bomb",
+  "category": "explosive",
+  "projectile": "proj_mk82",
+  "damage": 180,
+  "rateOfFire": 99,
+  "range": 16,
+  "accuracy": 0.60,
+  "aoeRadius": 5.5,
+  "carpetWidth": 3,
+  "carpetBombs": 4,
+  "tracerFX": "tracer_bomb",
+  "muzzleFX": null,
+  "impactFX": "explosion_large",
+  "audioOnFire": "sfx_bomb_drop",
+  "bursts": 1,
+  "note": "B-52 carpet bomb. Drops 4 bombs in a line. Large AOE. Triggers crater on impact."
+}

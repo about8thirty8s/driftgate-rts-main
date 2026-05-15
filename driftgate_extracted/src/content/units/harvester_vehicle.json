@@ -1,0 +1,19 @@
+{
+  "id": "harvester_vehicle",
+  "displayName": "Ore Collector",
+  "category": "vehicle",
+  "hp": 150,
+  "armour": "light",
+  "speed": 2.5,
+  "weapons": [],
+  "visionRadius": 4,
+  "buildTime": 8,
+  "cost": 0,
+  "canEnterTrench": false,
+  "canGarrison": false,
+  "selectionRadius": 0.7,
+  "crushable": false,
+  "tags": ["harvester"],
+  "description": "Autonomous ore collector. Assigned to a Refinery. Scrapes alluvial ore and returns for processing.",
+  "colourHex": "#d4a017"
+}
