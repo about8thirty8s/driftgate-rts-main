@@ -75,49 +75,6 @@ export class SelectionController {
     this._issueMoveOrder(tile.col, tile.row, modifiers.shift);
   }
 
-  // ── Public API aliases (used by Mission.jsx) ──────────────────────────────
-
-  get isDragging() { return this._dragging; }
-
-  startBoxSelect(sx, sy) {
-    this._dragStart = { x: sx, y: sy };
-    this._dragging  = false;
-    this._dragRect  = null;
-  }
-
-  updateBoxSelect(sx, sy) {
-    if (!this._dragStart) return;
-    const dx = Math.abs(sx - this._dragStart.x);
-    const dy = Math.abs(sy - this._dragStart.y);
-    if (dx > 4 || dy > 4) {
-      this._dragging = true;
-      this._dragRect = {
-        x1: Math.min(sx, this._dragStart.x),
-        y1: Math.min(sy, this._dragStart.y),
-        x2: Math.max(sx, this._dragStart.x),
-        y2: Math.max(sy, this._dragStart.y),
-      };
-    }
-  }
-
-  endBoxSelect(modifiers = {}) {
-    if (this._dragging && this._dragRect) {
-      this._boxSelect(this._dragRect, modifiers);
-    }
-    this._dragStart = null;
-    this._dragging  = false;
-    this._dragRect  = null;
-  }
-
-  selectSingle(entityId) {
-    this._clearSelection();
-    this._select(entityId);
-  }
-
-  clearSelection() {
-    this._clearSelection();
-  }
-
   // ── Selection logic ───────────────────────────────────────────────────────
 
   _clickSelect(sx, sy, modifiers) {
@@ -136,6 +93,7 @@ export class SelectionController {
         this._select(picked.id);
       }
     } else if (modifiers.ctrl) {
+      // Double click selects all of same type on screen — not implemented in click
       this._clearSelection();
       this._select(picked.id);
     } else {
@@ -160,6 +118,7 @@ export class SelectionController {
   }
 
   _pickEntity(sx, sy, { enemiesOnly = false } = {}) {
+    // Iterate entities, find the one closest to click in screen space
     let best = null;
     let bestDist = 20; // pixel threshold
 
@@ -209,6 +168,7 @@ export class SelectionController {
 
   _issueMoveOrder(col, row, queue = false) {
     const ids = [...this.selected];
+    // Formation offset for groups > 1
     const offsets = this._formationOffsets(ids.length);
 
     ids.forEach((id, i) => {
@@ -246,7 +206,9 @@ export class SelectionController {
 
   // ── Control Groups ────────────────────────────────────────────────────────
 
-  assignGroup(n) { this._groups[n] = [...this.selected]; }
+  assignGroup(n) {
+    this._groups[n] = [...this.selected];
+  }
 
   recallGroup(n) {
     if (!this._groups[n]?.length) return;
@@ -272,7 +234,18 @@ export class SelectionController {
 
   // ── Accessors ─────────────────────────────────────────────────────────────
 
-  getDragRect() { return this._dragging ? this._dragRect : null; }
-  getSelected() { return [...this.selected].map(id => this.entities.get(id)).filter(Boolean); }
-  getSelectedIds() { return [...this.selected]; }
+  getDragRect() {
+    return this._dragging ? this._dragRect : null;
+  }
+
+  getSelected() {
+    return [...this.selected]
+      .map(id => this.entities.get(id))
+      .filter(Boolean);
+  }
+
+  getSelectedIds() {
+    return [...this.selected];
+  }
 }
+

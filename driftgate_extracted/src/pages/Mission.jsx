@@ -310,41 +310,56 @@ export default function Mission({ onExit }) {
       const tile = s.camera.screenToTile(e.clientX, e.clientY);
       if (!tile) return;
 
-      if (e.button === 0) {
-        s.selection.startBoxSelect(e.clientX, e.clientY);
-        const clicked = s.entities.getAll().find(en => {
-          if (!en.alive || en.entityType !== 'UNIT') return false;
-          if (en.layer === 'garrisoned' || en.layer === 'subterrain') return false;
-          const sc = s.camera.tileToScreen(en.col, en.row);
-          return Math.hypot(sc.x - e.clientX, (sc.y + 14) - e.clientY) < 16;
-        });
-        clicked ? s.selection.selectSingle(clicked.id) : s.selection.clearSelection();
+      // Build placement takes priority on left-click
+      if (e.button === 0 && buildModeRef.current) {
+        const placed = s.buildSys.placeAt(tile.col, tile.row, buildModeRef.current);
+        if (placed) { buildModeRef.current = null; setBuildMode(null); }
+        return;
       }
 
-      if (e.button === 2) {
-        const selected = s.entities.getAll().filter(en => en.selected && en.faction === 'player');
-        for (const unit of selected) {
-          if (unit.layer === 'garrisoned') { garrison.exit(unit); continue; }
-          const path = pathfinder.findPath(
-            Math.round(unit.col), Math.round(unit.row), tile.col, tile.row,
-          );
-          if (path.length > 0) {
-            if (unit.entrenched) trench._exitTrench(unit, true);
-            unit.setPath(path);
-          }
+      // Attack-move mode: next left-click issues attack-move
+      if (e.button === 0 && attackMoveMode) {
+        attackMoveMode = false;
+        for (const unit of s.selection.getSelected()) {
+          if (unit.entityType !== 'UNIT') continue;
+          const path = pathfinder.findPath(Math.round(unit.col), Math.round(unit.row), tile.col, tile.row);
+          if (path.length > 0) { unit.setPath(path); unit._data.attackMove = true; }
         }
+        return;
+      }
+
+      // Right-click: cancel build or delegate to SelectionController
+      if (e.button === 2) {
+        if (buildModeRef.current) { buildModeRef.current = null; setBuildMode(null); return; }
+        attackMoveMode = false;
+        for (const unit of s.selection.getSelected()) {
+          if (unit.layer === 'garrisoned') garrison.exit(unit);
+        }
+        s.selection.onRightClick(e.clientX, e.clientY, { shift: e.shiftKey, ctrl: e.ctrlKey });
+        return;
+      }
+
+      // Left-click: delegate to SelectionController
+      if (e.button === 0) {
+        s.selection.onMouseDown(e.clientX, e.clientY, 0, { shift: e.shiftKey, ctrl: e.ctrlKey });
       }
     };
 
     const onMouseMove = (e) => {
       const s = stateRef.current;
       if (!s) return;
-      // Track cursor tile for build preview
       const t = s.camera.screenToTile(e.clientX, e.clientY);
       if (t) s._cursorTile = t;
-      if (s.selection?.isDragging) s.selection.updateBoxSelect(e.clientX, e.clientY);
+      s.selection.onMouseMove(e.clientX, e.clientY);
     };
-    const onMouseUp     = (e) => { if (e.button === 0) stateRef.current?.selection?.endBoxSelect(); };
+
+    const onMouseUp = (e) => {
+      if (e.button !== 0) return;
+      const s = stateRef.current;
+      if (!s) return;
+      s.selection.onMouseUp(e.clientX, e.clientY, 0, { shift: e.shiftKey, ctrl: e.ctrlKey });
+    };
+
     const onContextMenu = (e) => e.preventDefault();
     const onWheel       = (e) => {
       const s = stateRef.current;
@@ -591,12 +606,26 @@ function MissionHUD({ objective, phaseLabel, onExit, unitStatus = { selected: 0,
         </div>
       </div>
 
+      {/* Unit status bar */}
+      {unitStatus.total > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 42, left: '50%', transform: 'translateX(-50%)',
+          fontSize: 10, letterSpacing: 2, color: '#aaa',
+          background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)',
+          padding: '5px 18px', pointerEvents: 'none', display: 'flex', gap: 20,
+        }}>
+          <span style={{ color: '#4aff6a' }}>◆ {unitStatus.selected} SELECTED</span>
+          <span style={{ color: '#555' }}>|</span>
+          <span>TOTAL: {unitStatus.total}</span>
+        </div>
+      )}
+
       <div style={{
         position: 'fixed', bottom: 14, left: '50%', transform: 'translateX(-50%)',
-        fontSize: 9, letterSpacing: 2, color: 'rgba(255,255,255,0.12)',
-        background: 'rgba(0,0,0,0.4)', padding: '5px 14px', pointerEvents: 'none',
+        fontSize: 8, letterSpacing: 2, color: 'rgba(255,255,255,0.1)',
+        background: 'rgba(0,0,0,0.4)', padding: '4px 14px', pointerEvents: 'none',
       }}>
-        WASD — PAN &nbsp;|&nbsp; SCROLL — ZOOM &nbsp;|&nbsp; LEFT CLICK — SELECT &nbsp;|&nbsp; RIGHT CLICK — MOVE/ATTACK
+        WASD — PAN &nbsp;|&nbsp; SCROLL — ZOOM &nbsp;|&nbsp; RMB — MOVE/ATTACK &nbsp;|&nbsp; A — ATTACK MOVE &nbsp;|&nbsp; S — STOP &nbsp;|&nbsp; H — HOLD &nbsp;|&nbsp; CTRL+1-9 — GROUPS
       </div>
     </div>
   );
