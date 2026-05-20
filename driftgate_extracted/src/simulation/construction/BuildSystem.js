@@ -32,6 +32,8 @@ export class BuildSystem {
 
   // ── Economy ───────────────────────────────────────────────────────────────
 
+  canAfford(amount) { return this.credits >= amount; }
+
   addCredits(amount) {
     this.credits += amount;
     this.events.emit('credits_changed', { credits: this.credits });
@@ -90,6 +92,13 @@ export class BuildSystem {
     this.previewCol = col;
     this.previewRow = row;
     this.previewValid = this._canPlace(def, col, row);
+  }
+
+  // Convenience: place directly at col/row (bypasses preview state)
+  placeAt(col, row, defId, faction = 'player') {
+    this.startPlacement(defId);
+    this.updatePreview(col, row);
+    return this.confirmPlacement(faction);
   }
 
   // Attempt to place structure at current preview position

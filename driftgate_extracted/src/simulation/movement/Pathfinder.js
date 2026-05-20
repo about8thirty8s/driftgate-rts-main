@@ -156,7 +156,6 @@ export class Pathfinder {
     if (!tile) return false;
     if (tile.structureId) return false;
 
-    const { TILE_TYPES } = require('./TileGrid.js'); // lazy import to avoid circular
     // Use grid's walkability check
     return this.grid.isWalkable(col, row);
   }

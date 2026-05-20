@@ -59,7 +59,8 @@ const VICTORY_PAN_DURATION = 4.0; // seconds
 
 export default function Mission({ onExit }) {
   const canvasRef = useRef(null);
-  const stateRef  = useRef(null);
+  const stateRef     = useRef(null);
+  const buildModeRef = useRef(null);   // mirrors buildMode but accessible inside canvas callbacks
 
   const [phase,      setPhase]      = useState('briefing'); // 'briefing' | 'playing' | 'complete'
   const [result,     setResult]     = useState(null);       // 'victory' | 'defeat'
@@ -69,6 +70,9 @@ export default function Mission({ onExit }) {
   const [credits,    setCredits]    = useState(1000);
   const [buildMode,  setBuildMode]  = useState(null);        // null | defId string
   const [unitStatus, setUnitStatus] = useState({ selected: 0, total: 0 });
+
+  // Keep ref in sync so canvas callbacks always see current buildMode
+  React.useEffect(() => { buildModeRef.current = buildMode; }, [buildMode]);
 
   const handleBriefingComplete = useCallback(() => setPhase('playing'), []);
 
@@ -182,6 +186,11 @@ export default function Mission({ onExit }) {
     let missionStartTime = Date.now();
     let playerUnitsLost  = 0;
 
+    // ── Wire selection to HUD ─────────────────────────────────────────────
+    eventBus.on('selection_changed', ({ selected }) => {
+      setUnitStatus({ selected: selected.length, total: entities.getPlayerUnits().length });
+    });
+
     eventBus.on('mission_phase_advanced',   ({ label, objective: obj }) => { setPhaseLabel(label); setObjective(obj); });
     eventBus.on('mission_objective_updated', ({ text }) => setObjective(text));
 
@@ -253,7 +262,43 @@ export default function Mission({ onExit }) {
 
     // ── Camera keyboard state ─────────────────────────────────────────────
     const keys = {};
-    const onKeyDown = (e) => { keys[e.code] = true; if (e.code === 'Escape') onExit?.(); };
+    let attackMoveMode = false;
+
+    const onKeyDown = (e) => {
+      const s = stateRef.current;
+      keys[e.code] = true;
+
+      if (e.code === 'Escape') {
+        if (attackMoveMode) { attackMoveMode = false; return; }
+        onExit?.();
+      }
+
+      // Stop selected units (S key — only when not typing in an input)
+      if (e.code === 'KeyS' && e.target.tagName !== 'INPUT') {
+        s?.selection?.issueStopOrder?.();
+      }
+
+      // Hold position (H key)
+      if (e.code === 'KeyH' && e.target.tagName !== 'INPUT') {
+        s?.selection?.issueHoldOrder?.();
+      }
+
+      // Attack-move mode (A key — next left-click is attack-move)
+      if (e.code === 'KeyA' && e.target.tagName !== 'INPUT') {
+        if (s?.selection?.getSelectedIds().length > 0) attackMoveMode = true;
+      }
+
+      // Control groups: Ctrl+1-9 assign, 1-9 recall
+      if (e.code.startsWith('Digit') && !e.ctrlKey) {
+        const n = parseInt(e.code.replace('Digit', ''));
+        if (n >= 1 && n <= 9) s?.selection?.recallGroup?.(n);
+      }
+      if (e.code.startsWith('Digit') && e.ctrlKey) {
+        const n = parseInt(e.code.replace('Digit', ''));
+        if (n >= 1 && n <= 9) s?.selection?.assignGroup?.(n);
+        e.preventDefault();
+      }
+    };
     const onKeyUp   = (e) => { keys[e.code] = false; };
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup',   onKeyUp);
@@ -291,7 +336,14 @@ export default function Mission({ onExit }) {
       }
     };
 
-    const onMouseMove   = (e) => { if (stateRef.current?.selection?.isDragging) stateRef.current.selection.updateBoxSelect(e.clientX, e.clientY); };
+    const onMouseMove = (e) => {
+      const s = stateRef.current;
+      if (!s) return;
+      // Track cursor tile for build preview
+      const t = s.camera.screenToTile(e.clientX, e.clientY);
+      if (t) s._cursorTile = t;
+      if (s.selection?.isDragging) s.selection.updateBoxSelect(e.clientX, e.clientY);
+    };
     const onMouseUp     = (e) => { if (e.button === 0) stateRef.current?.selection?.endBoxSelect(); };
     const onContextMenu = (e) => e.preventDefault();
     const onWheel       = (e) => {
@@ -410,6 +462,37 @@ export default function Mission({ onExit }) {
       unitRenderer.render(ents.getAll(), s.subterrain);
 
       renderParticles(c, s.particles);
+
+      // Draw drag-select box
+      const dragRect = s.selection.getDragRect?.();
+      if (dragRect) {
+        c.save();
+        c.strokeStyle = 'rgba(80,255,80,0.85)';
+        c.lineWidth = 1.5;
+        c.setLineDash([4, 3]);
+        c.strokeRect(dragRect.x1, dragRect.y1, dragRect.x2 - dragRect.x1, dragRect.y2 - dragRect.y1);
+        c.fillStyle = 'rgba(80,255,80,0.08)';
+        c.fillRect(dragRect.x1, dragRect.y1, dragRect.x2 - dragRect.x1, dragRect.y2 - dragRect.y1);
+        c.restore();
+      }
+
+      // Draw build placement preview
+      if (buildModeRef.current && s.camera) {
+        // Highlight tile under cursor with a ghost overlay
+        const ghostTile = s._cursorTile;
+        if (ghostTile) {
+          const gscr = s.camera.tileToScreen(ghostTile.col, ghostTile.row);
+          c.save();
+          c.globalAlpha = 0.4;
+          c.fillStyle = s.buildSys.canAfford(STRUCT_DEFS[buildModeRef.current]?.cost ?? 0) ? '#44ff44' : '#ff4444';
+          c.fillRect(gscr.x - 24, gscr.y - 16, 48, 32);
+          c.globalAlpha = 1;
+          c.strokeStyle = '#ffffff';
+          c.lineWidth = 1;
+          c.strokeRect(gscr.x - 24, gscr.y - 16, 48, 32);
+          c.restore();
+        }
+      }
 
       if (s.panActive) {
         renderVictoryPanOverlay(c, canvas, s.panTimer, {
