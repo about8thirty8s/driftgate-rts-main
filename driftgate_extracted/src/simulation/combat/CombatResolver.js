@@ -152,7 +152,7 @@ export class CombatResolver {
       attackerId: attacker.id,
       targetId:   target.id,
       weaponId:   weapDef.id,
-      weaponDef,
+      weaponDef: weapDef,
       fromCol,
       fromRow,
       toCol:   target.col,
