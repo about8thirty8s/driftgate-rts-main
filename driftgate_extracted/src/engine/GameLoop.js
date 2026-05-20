@@ -12,7 +12,10 @@ const SIM_STEP  = 1000 / SIM_HZ;   // ms per sim tick (20ms)
 const MAX_FRAME_TIME = 250;         // clamp to avoid spiral of death
 
 export class GameLoop {
-  constructor({ onSimTick, onRender }) {
+  constructor(arg) {
+    // Accept single callback (legacy) or {onSimTick, onRender} object
+    const onSimTick = typeof arg === "function" ? arg : arg.onSimTick;
+    const onRender  = typeof arg === "function" ? arg : arg.onRender;
     this.onSimTick  = onSimTick;  // (dt: seconds) => void
     this.onRender   = onRender;   // (alpha: 0-1 interpolation) => void
 
@@ -79,7 +82,7 @@ export class GameLoop {
     const alpha = this._accumulator / SIM_STEP;
 
     // Render
-    this.onRender(alpha);
+    if (typeof this.onRender === "function") this.onRender(alpha);
 
     // FPS tracking
     this.stats._fpsCount++;
