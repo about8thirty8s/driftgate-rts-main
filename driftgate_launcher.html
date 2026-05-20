@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driftgate RTS — Playtest v0.3.1</title>
+  <link rel="stylesheet" href="https://base44.app/api/apps/6a052e31974cfce1b2882157/files/mp/public/6a052e31974cfce1b2882157/38733bf2e_driftgate_game.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #root { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
+    canvas { display: block; }
+
+    /* Sprite proxy: rewrite /sprites/ paths to GitHub raw */
+    /* Handled via JS below */
+
+    #loading-screen {
+      position: fixed; inset: 0; background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #4a7c3f; font-family: monospace; z-index: 9999;
+    }
+    #loading-screen.hidden { display: none; }
+    .load-title { font-size: 28px; letter-spacing: 6px; margin-bottom: 16px; }
+    .load-sub { font-size: 12px; color: #444; letter-spacing: 3px; }
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="load-title">DRIFTGATE RTS</div>
+    <div class="load-sub">LOADING ENGINE...</div>
+  </div>
+  <div id="root"></div>
+
+  <script>
+    // Intercept Image src assignments to rewrite /sprites/ → GitHub raw
+    const SPRITE_BASE = "https://raw.githubusercontent.com/about8thirty8s/driftgate-rts-main/main/public";
+    const _NativeImage = window.Image;
+    class PatchedImage extends _NativeImage {
+      set src(val) {
+        if (val && val.startsWith('/sprites/')) {
+          super.src = SPRITE_BASE + val;
+        } else {
+          super.src = val;
+        }
+      }
+      get src() { return super.src; }
+    }
+    window.Image = PatchedImage;
+
+    // Hide loading screen once React mounts
+    const observer = new MutationObserver(() => {
+      const root = document.getElementById('root');
+      if (root && root.children.length > 0) {
+        document.getElementById('loading-screen').classList.add('hidden');
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.getElementById('root'), { childList: true });
+  </script>
+
+  <script type="module" src="https://base44.app/api/apps/6a052e31974cfce1b2882157/files/mp/public/6a052e31974cfce1b2882157/dcebc0fa0_driftgate_game.js"></script>
+</body>
+</html>
