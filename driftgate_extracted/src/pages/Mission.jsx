@@ -401,11 +401,7 @@ export default function Mission({ onExit }) {
           g.cols, g.rows,
         );
       } else {
-        const PAN = 6 * cam.zoom;
-        if (keys['ArrowLeft']  || keys['KeyA']) cam.offsetX += PAN;
-        if (keys['ArrowRight'] || keys['KeyD']) cam.offsetX -= PAN;
-        if (keys['ArrowUp']    || keys['KeyW']) cam.offsetY += PAN;
-        if (keys['ArrowDown']  || keys['KeyS']) cam.offsetY -= PAN;
+        cam.update(dt);
       }
 
       // ── Sim tick ──────────────────────────────────────────────────────
