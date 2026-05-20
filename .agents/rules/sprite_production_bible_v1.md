@@ -1,7 +1,7 @@
 # DRIFTGATE STUDIOS
-# RTS SPRITE PRODUCTION BIBLE — VERSION 1.0
+# RTS SPRITE PRODUCTION BIBLE — VERSION 1.1
 # Authored by Marshal, Studio President
-# Date: 2026-05-14
+# Created: 2026-05-14 | Updated: 2026-05-20
 # Status: CANONICAL — supersedes all prior asset standards
 
 ---
@@ -39,6 +39,7 @@ Every asset decision is filtered through this lens. Art quality is secondary to 
 - Any asset where the top of the unit is not visible
 - Any asset where vertical tilt exceeds 35° (looks too side-on)
 - Any asset that looks correct when displayed upright like a photo
+- Any asset where N and S faces look front-on rather than top-down
 
 ### Scale Reference (world units)
 | Unit Type       | Display Size (px, 128px tile) | World Footprint |
@@ -98,6 +99,26 @@ Layer 9: World-space UI (flags, icons, waypoints)
 Hull and turret are separate sprite sets, each 8 directions.
 Total sprites per vehicle: 8 hull + 8 turret = **16 sprites minimum**
 
+### VEHICLE GENERATION STRATEGY — 6+2 RULE (MANDATORY)
+
+AI diffusion models (DALL-E 3 and equivalents) reliably produce diagonal views
+but consistently fail on true cardinal (N/S) directions — generating front-on
+portraits instead of top-down isometric.
+
+**Approved production method: Generate 6, derive 2.**
+
+Generate these 6 directions via AI or 3D render:
+- NE, E, SE, SW, W, NW (diagonals + true laterals)
+
+Derive these 2 via engine-side direction snapping:
+- N → snap to NW sprite
+- S → snap to SW sprite
+
+This avoids perspective drift while maintaining 8-direction gameplay.
+
+**Long-term target:** Blender-based 3D render pipeline for all 8 vehicle directions.
+Blender eliminates the N/S drift problem entirely. AI generation is a bridge, not a destination.
+
 ### Required Documentation Per Vehicle
 ```
 unit_id:              (e.g. vehicle_t72)
@@ -114,6 +135,7 @@ selection_radius:     (world units)
 collision_footprint:  (W×H in world units)
 render_layer_hull:    3
 render_layer_turret:  4
+direction_snap_map:   { N: NW, S: SW }  (if using 6+2 strategy)
 animation_states:
   - idle (hull: static, turret: static)
   - move (hull: track animation, turret: static)
@@ -161,7 +183,8 @@ Build hull once. Swap turrets. Multiple units for near-zero additional cost.
 ### Directions Required
 Infantry: 8-directional walk cycle minimum
 Frames per direction: 4–6 walk frames, 2–4 attack frames, 1 death frame
-Total frames per infantry unit: ~60–80 frames (or simplified 4-frame loop is acceptable for MVP)
+Total frames per infantry unit: ~60–80 frames
+MVP acceptable: 4-frame walk loop per direction
 
 ### Readability Test
 At 32×48 display size, player must immediately identify:
@@ -214,6 +237,21 @@ ui_icon:              64×64 PNG
 4. **Damage overlay** — scorches, holes, partial collapse
 5. **Destroyed rubble** — static wreck
 
+### Buildings must ALWAYS be:
+- Bottom-anchored (center-bottom of footprint = world anchor)
+- Tightly cropped to bounding box — no padding that causes placement offset
+- Bottom-heavy in mass distribution (~60% mass below center line)
+- Free of alpha fringing, halos, or colour-bleed edges
+
+### Alpha Quality Standard for Buildings
+All building sprites must pass this checklist before integration:
+- [ ] True RGBA alpha — no baked background, no checkerboard
+- [ ] No magenta fringe (R>180, G<80, B>180 at any alpha)
+- [ ] No dark halo (near-black semi-transparent border pixels)
+- [ ] No colour-bleed anti-aliasing from previous background
+- [ ] 1px Gaussian alpha-feather applied to all edges
+- [ ] Visually confirmed clean on BOTH green and white background composites
+
 ### Animated Parts — Only Separate When Gameplay Requires
 | Part             | Separate Layer? | Reason                          |
 |-----------------|-----------------|----------------------------------|
@@ -264,302 +302,318 @@ ui_icon:              64×64 PNG
 | Barracks              | Both      | 2×3   | 🔴 P0    |
 | War Factory           | Both      | 3×3   | 🔴 P0    |
 | Ore Refinery          | Both      | 3×2   | 🔴 P0    |
-| Ore Silo              | Both      | 2×2   | 🟡 P1    |
-| Pillbox / Bunker      | Both      | 1×1   | 🟡 P1    |
-| Radar Dome            | Allied    | 2×2   | 🟢 P2    |
-| SAM Site              | Soviet    | 2×2   | 🟢 P2    |
+
+### Existing Building Inventory (as of May 2026)
+| Asset                          | Pack      | Status              | Action          |
+|-------------------------------|-----------|---------------------|-----------------|
+| building_01_command_center     | General   | Usable              | Crop + integrate|
+| building_02_power_plant        | General   | Usable              | Crop + integrate|
+| building_03_barracks           | General   | Usable              | Crop + integrate|
+| building_04_pillbox            | General   | Usable (defensive)  | Defer           |
+| building_05_sandbags           | General   | Regenerate          | Wrong scale     |
+| building_06_vehicle_factory    | General   | Usable              | Crop + integrate|
+| building_07_tech_center        | General   | Move to Allied      | Rename          |
+| building_08_comms_facility     | General   | Usable              | Crop + integrate|
+| building_09_airfield           | General   | Defer (post FP)     | Not P0          |
+| building_10_naval_yard         | General   | Defer (post FP)     | Not P0          |
+| building_11_antitank_bunker    | General   | Usable (defensive)  | Defer           |
+| soviet_01–09                   | Soviet    | Usable (most)       | Crop + integrate|
+| soviet_06_comms_facility       | Soviet    | Regenerate          | Wrong angle     |
+| bunker_01–10                   | Defensive | Clean (May 2026)    | Defer to P1     |
+| mg_01–10                       | Defensive | Clean (May 2026)    | Defer to P1     |
+| at_gun_01–02                   | Defensive | Clean (May 2026)    | Defer to P1     |
+| tower_01–10                    | Defensive | Clean (May 2026)    | Defer to P1     |
+| wall_01–05                     | Defensive | Clean (May 2026)    | Defer to P1     |
 
 ---
 
 ## PART 6: AIRCRAFT ASSET STANDARD
 
-### MVP Layers (required)
-1. **Body** — full aircraft silhouette
-2. **Rotor / propeller** — SEPARATE layer if animated (helicopters)
-3. **Programmatic shadow** — altitude-offset ground shadow, engine-controlled
-4. **Damage state** — smoke trail
-5. **Crash / wreck state** — ground debris
+### MVP Layers
+1. **Body** — full aircraft, correct isometric angle
+2. **Rotor / propeller** — separate layer if animated
+3. **Programmatic shadow** — independently positioned (altitude-aware)
+4. **Weapon hardpoints** — only if visually distinct at gameplay zoom
+5. **Damage state** — smoke overlay
+6. **Wreck / crash** — debris sprite, ground-level
 
-### Key Rule: Aircraft Shadow
-Aircraft shadow is ALWAYS programmatic — never baked.
-Reason: altitude changes dynamically. A baked shadow is always wrong.
-Shadow is rendered at ground-plane level, offset from aircraft world position.
-
-### Helicopters vs Jets
-| Type       | Rotor Layer | Shadow Type  | Attack States        |
-|-----------|-------------|--------------|----------------------|
-| Helicopter | Separate    | Programmatic | Hover + strafe       |
-| Jet        | None        | Programmatic | Pass + dive          |
-| Bomber     | None        | Programmatic | Pass only            |
+### Key Differences from Ground Units
+- Shadow is altitude-offset from body (must be separate + controllable)
+- Rotor must be separate if spinning (helicopters)
+- Fixed-wing aircraft may use a single baked sprite if banking is not animated
+- Aircraft do NOT use selection circles — use selection rings instead
 
 ### Required Documentation Per Aircraft
 ```
 unit_id:
 display_name:
 faction:
-is_helicopter:        (bool)
-is_jet:               (bool)
 sprite_size_px:
-anchor_point:         center of aircraft body (not ground projected)
-shadow_offset:        (world units below aircraft, programmatic)
-rotor_pivot:          (if helicopter, pixel center of rotor layer)
-weapon_hardpoints:    [list of pixel offsets for missile/bomb spawn]
+anchor_point:         center of body sprite (not bottom — aircraft floats)
+shadow_offset:        (x,y pixel offset from anchor, altitude-dependent)
+rotor_pivot:          (if applicable)
+weapon_hardpoints:    [pixel offsets for weapon spawn points]
+selection_ring_radius:
+altitude:             (low | medium | high — affects shadow distance)
 animation_states:
-  - idle (landed or airborne hover)
-  - move (banking if jet, hover-translate if helicopter)
-  - attack (weapon fire, rotor unchanged)
+  - fly (rotor loop or banking frames)
+  - attack (weapon fire)
   - damaged (smoke trail)
-  - destroyed (crash sequence → ground debris)
-altitude:             (world units above ground, affects shadow offset)
-selection_radius:
-collision_footprint:
-ui_icon:              64×64 PNG
+  - crash (debris sequence)
 ```
 
 ---
 
-## PART 7: NAMING CONVENTIONS
+## PART 7: NAVAL ASSET STANDARD
 
-### Files
-```
-{faction}_{type}_{unit}_{layer}_{direction}_{state}.png
+**STATUS: DEFERRED. Do not begin until first land skirmish is playable.**
 
-Examples:
-soviet_vehicle_t72_hull_NE_idle.png
-soviet_vehicle_t72_turret_NE_idle.png
-soviet_vehicle_t72_hull_SE_move.png
-soviet_vehicle_t72_wreck.png
-allied_infantry_rifleman_body_S_walk_01.png
-allied_building_barracks_base.png
-allied_building_barracks_damage_01.png
-allied_building_barracks_rubble.png
-allied_aircraft_huey_body_NE.png
-allied_aircraft_huey_rotor_spin.png
-```
-
-### Faction Codes
-- `allied` — NATO / US / Western
-- `soviet` — Warsaw Pact / Soviet / Proxy
-- `neutral` — Civilian / Support / Shared
-
-### Type Codes
-- `vehicle` — ground vehicles
-- `infantry` — foot soldiers
-- `building` — structures
-- `aircraft` — air units
-- `naval` — sea units
-- `fx` — visual effects
-- `ui` — interface elements
-- `decal` — ground marks
-
-### Directions
-N, NE, E, SE, S, SW, W, NW
-
-### States
-idle, move, attack, damaged, dead, wreck, ghost, construction_0–3
+When the time comes:
+- Hull layer
+- Turret/weapon layer if applicable
+- Wake FX (particle, not sprite)
+- Damage state
+- Sinking/debris state
 
 ---
 
-## PART 8: FOLDER STRUCTURE
+## PART 8: FX ASSET STANDARD
+
+### First Playable FX (minimum viable)
+| Effect          | Frames | Size       | Priority |
+|----------------|--------|------------|----------|
+| Muzzle flash    | 3      | 32×32      | 🔴 P0    |
+| Small explosion | 6      | 64×64      | 🔴 P0    |
+| Unit death      | 4      | 48×48      | 🔴 P0    |
+| Smoke loop      | 4      | 32×32      | 🔴 P0    |
+| Building rubble | 1      | Match bldg | 🔴 P0    |
+| Hit flash       | 2      | 16×16      | 🟡 P1    |
+| Crater decal    | 1      | 64×64      | 🟡 P1    |
+| Blood/dirt      | 1      | 24×24      | 🟡 P1    |
+
+---
+
+## PART 9: ALPHA & EDGE QUALITY STANDARD
+
+All sprites must pass a two-stage cleanup before engine integration:
+
+### Stage 1: Pixel Audit
+Using PIL/NumPy or equivalent, scan for:
+- Strong magenta: R>180, G<80, B>180 at any alpha → zero alpha
+- Soft fringe: R>130, G<110, B>130, alpha 5–200 → zero alpha
+- Dark halo: R<60, G<60, B<60, alpha 10–200 → inspect manually
+
+### Stage 2: Visual Audit
+Composite every sprite onto:
+1. **Bright green background** — reveals colour-bleed halos
+2. **White background** — reveals dark border halos
+
+Only sprites that show a clean silhouette on BOTH backgrounds pass.
+
+### Stage 3: 1px Feather
+Apply 1px Gaussian alpha feather to all edges after cleanup.
+This restores soft anti-aliasing lost during aggressive alpha erosion.
+
+### Cleanup Script Standard
+All batch cleanup must use the production PIL script at:
+`.agents/skills/alpha_cleanup.py` (create if not exists)
+
+Parameters:
+- `erosion_radius`: 1 (default), 2 (aggressive)
+- `feather_radius`: 1 (always apply after erosion)
+- `magenta_threshold`: R>180, G<80, B>180
+- `fringe_threshold`: R>130, G<110, B>130, A<200
+
+---
+
+## PART 10: FOLDER STRUCTURE
 
 ```
-assets/
+sprites/
   units/
     allied/
-      infantry/
-        rifleman/
-          body/         ← 8-dir walk frames
-          death/        ← corpse frame
-          icon.png
-          rifleman.json ← full spec doc
-        engineer/
-        ranger/
-        grenadier/
-        stinger/
-        marine/
-      vehicles/
-        jeep/
-        m113/
-        m60_tank/
-        m1_abrams/
-        m270_mlrs/
-        hmmwv/
-      aircraft/
-        huey/
-        apache/
-        f4_phantom/
-        a10_warthog/
-        b52/
-      naval/
-        pbr/
-        destroyer/
+      rifleman/
+        rifleman_N.png ... rifleman_NW.png  (8 dirs)
+        rifleman_death.png
+        rifleman_icon.png
+      tank_m60/
+        hull/
+          m60_hull_NE.png ... m60_hull_NW.png  (6 generated + 2 derived)
+        turret/
+          m60_turret_NE.png ... m60_turret_NW.png
+        m60_wreck.png
+        m60_icon.png
     soviet/
-      infantry/
-        conscript/
-        vietcong/
-        spetsnaz/
-        rpg_crew/
-        strela_aa/
-        north_korean/
-      vehicles/
-        t34/
-        t55/
-        t72/
-          hull/         ← 8-dir hull sprites
-          turret/       ← 8-dir turret sprites
-          wreck/
-          damage/
-          icon.png
-          t72.json      ← full spec doc
-        btr60/
-        bmp1/
-        zsu23/
-        grad/
-      aircraft/
-        mig15/
-        mig21/
-        mig29/
-        su25/
-        mi24_hind/
-    neutral/
-      support/
-        ore_collector/
+      conscript/
+      tank_t72/
+        hull/
+        turret/
   buildings/
     allied/
-      construction_yard/
-      power_plant/
-      barracks/
-      war_factory/
-      refinery/
-      radar/
     soviet/
-      construction_yard/
-      power_plant/
-      barracks/
-      war_factory/
-      refinery/
-      sam_site/
-    shared/
-      ore_silo/
-      sandbags/
+    defensive/
+    neutral/
   fx/
     explosions/
-    muzzle_flash/
+    muzzle/
     smoke/
-    fire/
-    craters/
-    dust/
+    death/
+    decals/
   ui/
     icons/
     hud/
-    cursors/
-  terrain/
-    tiles/
-    decals/
 ```
 
 ---
 
-## PART 9: ANTI-DRIFT RULES
-
-### Before First Playable, These Are Banned
-- New factions
-- Naval combat expansion
-- Hero units
-- Campaign cinematics
-- Weather systems
-- Superweapons
-- Advanced lore documents
-- New art packs beyond first playable checklist
-- Additional unit rosters
-
-### If Requested, Response Is
-> "Great idea. Not now. First playable first."
-
-### What Is NOT Banned
-- Fixing broken systems in driftgate-rts
-- Improving existing assets to meet production standard
-- Writing specs and JSON for units already in first playable scope
-- Documenting engine integration requirements
-- Sprint planning
-
-### Do NOT Rebuild These Systems
-- GameLoop
-- Pathfinder
-- IsometricCamera
-- SelectionController
-- HarvesterSystem
-- CombatResolver
-- EnemyAIController
-- VeterancySystem
-
-Touch only to fix bugs or add a required first-playable hook.
-
----
-
-## PART 10: PRODUCTION READINESS CHECKLIST
-
-An asset is production-ready when ALL of these are true:
-
-### Visual
-- [ ] Correct 45–60° isometric angle — no drift
-- [ ] True RGBA alpha transparency — no baked background
-- [ ] 1px soft-edge anti-aliasing applied
-- [ ] Tight bounding box crop (no excessive padding)
-- [ ] Readable at 64px and 128px display sizes
-- [ ] Silhouette clearly communicates role
-
-### Technical
-- [ ] Correct naming convention applied
-- [ ] Placed in correct folder structure
-- [ ] JSON spec document complete (all fields filled)
-- [ ] Anchor point defined and tested
-- [ ] Damage states exist (at minimum: healthy + destroyed)
-- [ ] UI icon exists (64×64)
-- [ ] Engine integration notes written
-
-### Gameplay
-- [ ] Role is clear at gameplay zoom
-- [ ] Faction identity is visible
-- [ ] Direction is readable for 8-directional movement
-- [ ] Weapon type is identifiable
-
----
-
-## PART 11: FIRST PLAYABLE ASSET CHECKLIST
-
-The minimum asset set to reach first playable skirmish:
+## PART 11: NAMING CONVENTIONS
 
 ### Units
-- [ ] GI Rifleman — Allied infantry, 8-dir
-- [ ] Soviet Conscript — Soviet infantry, 8-dir
-- [ ] M60 Patton or M1 Abrams — Allied tank, 8-dir hull + turret
-- [ ] T-72 — Soviet tank, 8-dir hull + turret
-- [ ] Ore Collector — both factions, 4-dir minimum
+`{faction}_{role}_{variant}_{direction}.png`
+- `allied_rifleman_gi_NE.png`
+- `soviet_tank_t72_hull_SW.png`
+- `soviet_tank_t72_turret_SW.png`
 
 ### Buildings
-- [ ] Construction Yard — Allied + Soviet variants
-- [ ] Power Plant — Allied + Soviet variants
-- [ ] Barracks — Allied + Soviet variants
-- [ ] War Factory — Allied + Soviet variants
-- [ ] Ore Refinery — Allied + Soviet variants
+`{faction}_{type}_{id}.png`
+- `allied_barracks_01.png`
+- `soviet_war_factory_01.png`
+- `defensive_bunker_pillbox_01.png`
 
 ### FX
-- [ ] Cannon muzzle flash
-- [ ] Small explosion
-- [ ] Medium explosion
-- [ ] Unit death flash
-- [ ] Smoke (looping)
+`fx_{type}_{frame}.png`
+- `fx_explosion_small_00.png` through `fx_explosion_small_05.png`
+- `fx_muzzle_tank_00.png`
 
-### UI
-- [ ] Unit icons for all first-playable units (64×64)
-- [ ] Building icons for all first-playable buildings (64×64)
-- [ ] Health bar sprites
-- [ ] Credit counter
-- [ ] Basic HUD frame
+### Icons
+`icon_{unit_id}.png` — always 64×64 PNG
 
 ---
 
-*End of Sprite Production Bible V1.0*
+## PART 12: PIVOT & ANCHOR CONVENTIONS
+
+### Ground Units (infantry + vehicles)
+- **Anchor:** center-bottom of sprite
+- **Meaning:** the world tile position maps to the bottom-center of the unit sprite
+- **Turret pivot:** pixel offset from hull anchor (x right, y up from anchor)
+
+### Buildings
+- **Anchor:** center-bottom of footprint
+- **Must be tightly cropped** — any padding shifts the anchor off the grid
+
+### Aircraft
+- **Anchor:** center of body sprite
+- **Shadow:** separate offset, not anchored to body
+
+### FX
+- **Anchor:** center of effect sprite
+
+---
+
+## PART 13: ENGINE INTEGRATION SPEC FORMAT
+
+Every asset must ship with a JSON spec readable by the engine systems.
+
+```json
+{
+  "id": "vehicle_t72",
+  "type": "vehicle",
+  "faction": "soviet",
+  "displayName": "T-72 Main Battle Tank",
+  "spriteSize": [128, 128],
+  "anchor": [64, 112],
+  "turretPivot": [64, 76],
+  "muzzleOffset": [0, -42],
+  "selectionRadius": 1.5,
+  "collisionFootprint": [1.4, 1.4],
+  "renderLayers": {
+    "hull": 3,
+    "turret": 4,
+    "shadow": 2,
+    "damage": 6
+  },
+  "directionSnapMap": { "N": "NW", "S": "SW" },
+  "directions": ["NE", "E", "SE", "SW", "W", "NW"],
+  "animationStates": ["idle", "move", "attack", "damaged", "destroyed"],
+  "damageThresholds": {
+    "healthy": 1.0,
+    "damaged": 0.59,
+    "critical": 0.24,
+    "dead": 0
+  },
+  "spriteFiles": {
+    "hull_NE": "sprites/units/soviet/tank_t72/hull/t72_hull_NE.png",
+    "turret_NE": "sprites/units/soviet/tank_t72/turret/t72_turret_NE.png"
+  },
+  "uiIcon": "sprites/ui/icons/icon_vehicle_t72.png"
+}
+```
+
+---
+
+## PART 14: FIRST PLAYABLE ASSET CHECKLIST
+
+### Minimum asset set to ship first playable skirmish:
+
+**Units**
+- [ ] allied_rifleman — 8-dir walk + death frame
+- [ ] soviet_conscript — 8-dir walk + death frame
+- [ ] allied_tank_m60 — hull 6-dir + turret 6-dir + wreck
+- [ ] soviet_tank_t72 — hull 6-dir + turret 6-dir + wreck ← IN PROGRESS
+- [ ] harvester — existing, confirm anchor + integrate
+
+**Buildings**
+- [ ] Construction Yard — Allied + Soviet
+- [ ] Power Plant — Allied + Soviet
+- [ ] Barracks — Allied + Soviet
+- [ ] War Factory — Allied + Soviet
+- [ ] Ore Refinery — Allied + Soviet
+
+**FX**
+- [ ] fx_explosion_small (6 frames)
+- [ ] fx_muzzle_tank (3 frames)
+- [ ] fx_smoke_loop (4 frames)
+- [ ] fx_death_infantry (4 frames)
+
+**Icons**
+- [ ] icon for every P0 unit
+- [ ] icon for every P0 building
+
+**Alpha Quality**
+- [ ] All sprites pass green + white background audit
+- [ ] All sprites have 1px feather applied
+- [ ] No magenta, no dark halos, no colour bleed
+
+---
+
+## PART 15: ANTI-DRIFT RULES
+
+Do not expand scope until first playable skirmish exists.
+
+If these come up — say: **"Great idea. Not now. First playable first."**
+
+- More factions
+- Naval combat
+- Air combat (beyond what already exists in engine)
+- Superweapons
+- Campaign cinematics
+- Advanced weather
+- Hero units
+- Full lore expansion
+- Additional art packs (beyond first playable scope)
+- Multiplayer
+- Mod tools
+- New game modes
+
+The only valid work before first playable:
+1. Engine integration and bug fixing
+2. First playable asset set (Part 14)
+3. HUD and win/lose condition
+4. Enemy AI producing and attacking
+5. Alpha cleanup on existing assets
+
+---
+
+*End of Sprite Production Bible V1.1*
 *Driftgate Studios — Internal Document*
-*All decisions override prior informal standards*
+*Updated: 2026-05-20*
