@@ -54,6 +54,10 @@ import { UNIT_DEFS, WEAPON_DEFS, PROJ_DEFS, STRUCT_DEFS } from '../content/defs.
 // Mission data
 import brokenCrossingDef from '../content/missions/broken_crossing.json';
 
+// New presentation systems
+import { CommandFeedback } from '../presentation/CommandFeedback.js';
+import { MinimapRenderer } from '../presentation/MinimapRenderer.js';
+
 // ── Constants ────────────────────────────────────────────────────────────────
 const VICTORY_PAN_DURATION = 4.0; // seconds
 
@@ -185,6 +189,16 @@ export default function Mission({ onExit }) {
     // ── Credits sync ─────────────────────────────────────────────────────
     setCredits(buildSys.credits);
     eventBus.on('credits_changed', ({ credits: c }) => setCredits(c));
+
+    // ── Command feedback ──────────────────────────────────────────────────
+    // Wire via eventBus so feedback fires regardless of input path
+    eventBus.on('move_order_issued', ({ col, row }) => {
+      stateRef.current?.commandFeedback?.trigger(col, row, 'move');
+    });
+    eventBus.on('attack_order_issued', ({ targetId }) => {
+      const tgt = entities.get(targetId);
+      if (tgt) stateRef.current?.commandFeedback?.trigger(tgt.col, tgt.row, 'attack');
+    });
 
     // ── Mission events → React state ──────────────────────────────────────
     let missionStartTime = Date.now();
@@ -337,6 +351,7 @@ export default function Mission({ onExit }) {
       // Attack-move mode: next left-click issues attack-move
       if (e.button === 0 && attackMoveMode) {
         attackMoveMode = false;
+        s?.commandFeedback?.trigger(tile.col, tile.row, 'attackMove');
         for (const unit of s.selection.getSelected()) {
           if (unit.entityType !== 'UNIT') continue;
           const path = pathfinder.findPath(Math.round(unit.col), Math.round(unit.row), tile.col, tile.row);
@@ -392,12 +407,16 @@ export default function Mission({ onExit }) {
     canvas.addEventListener('wheel',       onWheel, { passive: true });
 
     // ── State ref ─────────────────────────────────────────────────────────
+    const commandFeedback = new CommandFeedback(ctx, camera);
+    const minimapRenderer  = new MinimapRenderer(ctx, camera);
+
     stateRef.current = {
       ctx, canvas, eventBus, grid, meta, entities, pathfinder,
       camera, tileRenderer, unitRenderer, structureRenderer,
       selection, combat, garrison, subterrain, trench,
       director, enemyAI, buildSys, spawner,
       resourceFields, oilDerrickSys, harvesterSys,
+      commandFeedback, minimapRenderer,
       particles, panActive: false, panTimer: 0,
       pendingMoves: [], pendingGarrison: [], pendingExits: [],
     };
@@ -528,6 +547,14 @@ export default function Mission({ onExit }) {
       unitRenderer.render(ents.getAll(), s.subterrain);
 
       renderParticles(c, s.particles);
+
+      // Command feedback markers
+      s.commandFeedback?.tick(dt);
+      s.commandFeedback?.render();
+
+      // Minimap
+      s.minimapRenderer?.markDirty();
+      s.minimapRenderer?.render(g, ents, canvas.width, canvas.height);
 
       // Draw drag-select box
       const dragRect = s.selection.getDragRect?.();
