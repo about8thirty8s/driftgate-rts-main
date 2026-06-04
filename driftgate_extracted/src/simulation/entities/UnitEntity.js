@@ -137,8 +137,9 @@ export class UnitEntity extends Entity {
 
   _dirToFacing(dc, dr) {
     // 8-way facing: 0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SW, 6=W, 7=NW
-    const angle = Math.atan2(dr, dc); // atan2(row, col)
-    const deg = ((angle * 180 / Math.PI) + 360) % 360;
+    // atan2(dr, dc) gives 0° for East; we rotate +90° so North (-90°) maps to 0.
+    const angle = Math.atan2(dr, dc);
+    const deg = ((angle * 180 / Math.PI) + 90 + 360) % 360;
     return Math.round(deg / 45) % 8;
   }
 

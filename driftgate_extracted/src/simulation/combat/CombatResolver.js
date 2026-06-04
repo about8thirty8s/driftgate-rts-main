@@ -217,7 +217,9 @@ export class CombatResolver {
     // Find all entities in radius
     const targets = this.entities.getAll().filter(e => {
       if (!e.alive) return false;
-      if (e.id === attacker.id) return false; // no self-damage for now
+      if (e.id === attacker.id) return false;         // no self-damage
+      if (e.faction === attacker.faction) return false; // no friendly fire from AOE
+      if (e.entityType === 'PROJECTILE') return false;
       const dc = e.col - centreCol;
       const dr = e.row - centreRow;
       return Math.sqrt(dc * dc + dr * dr) <= radius;
@@ -307,7 +309,7 @@ export class CombatResolver {
   _checkVeterancy(entity) {
     const thresholds = [3, 8, 15];
     for (let i = 2; i >= 0; i--) {
-      if (entity.kills >= thresholds[i] && entity.veterancy <= i) {
+      if (entity.kills >= thresholds[i] && entity.veterancy < i + 1) {
         entity.veterancy = i + 1;
         this.events.emit('veterancy_gained', { entityId: entity.id, level: entity.veterancy });
         break;

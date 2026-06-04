@@ -72,7 +72,7 @@ class MinHeap {
 export class Pathfinder {
   constructor(tileGrid) {
     this.grid = tileGrid;
-    this.MAX_NODES = 2048; // abort search after this many nodes
+    this.MAX_NODES = 8192; // abort search after this many nodes (40x40 map needs up to ~3200)
   }
 
   /**

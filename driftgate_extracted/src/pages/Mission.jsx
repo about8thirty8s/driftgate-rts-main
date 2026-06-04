@@ -182,6 +182,10 @@ export default function Mission({ onExit }) {
     for (const u  of entities.getPlayerUnits())      grid.revealFog(Math.round(u.col),  Math.round(u.row),  u.visionRadius ?? 6);
     for (const st of entities.getPlayerStructures()) grid.revealFog(Math.round(st.col), Math.round(st.row), 6);
 
+    // ── Credits sync ─────────────────────────────────────────────────────
+    setCredits(buildSys.credits);
+    eventBus.on('credits_changed', ({ credits: c }) => setCredits(c));
+
     // ── Mission events → React state ──────────────────────────────────────
     let missionStartTime = Date.now();
     let playerUnitsLost  = 0;
@@ -264,9 +268,19 @@ export default function Mission({ onExit }) {
     const keys = {};
     let attackMoveMode = false;
 
+    const panKeyMap = {
+      'ArrowUp': 'up', 'KeyW': 'up',
+      'ArrowDown': 'down', 'KeyS': 'down',
+      'ArrowLeft': 'left', 'KeyA': 'left',
+      'ArrowRight': 'right', 'KeyD': 'right',
+    };
+
     const onKeyDown = (e) => {
       const s = stateRef.current;
       keys[e.code] = true;
+      if (panKeyMap[e.code] && e.target.tagName !== 'INPUT') {
+        s?.camera?.setPanKey(panKeyMap[e.code], true);
+      }
 
       if (e.code === 'Escape') {
         if (attackMoveMode) { attackMoveMode = false; return; }
@@ -299,7 +313,10 @@ export default function Mission({ onExit }) {
         e.preventDefault();
       }
     };
-    const onKeyUp   = (e) => { keys[e.code] = false; };
+    const onKeyUp   = (e) => {
+      keys[e.code] = false;
+      if (panKeyMap[e.code]) stateRef.current?.camera?.setPanKey(panKeyMap[e.code], false);
+    };
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup',   onKeyUp);
 
@@ -350,6 +367,7 @@ export default function Mission({ onExit }) {
       if (!s) return;
       const t = s.camera.screenToTile(e.clientX, e.clientY);
       if (t) s._cursorTile = t;
+      s.camera.setMousePosition(e.clientX, e.clientY);
       s.selection.onMouseMove(e.clientX, e.clientY);
     };
 
@@ -364,7 +382,7 @@ export default function Mission({ onExit }) {
     const onWheel       = (e) => {
       const s = stateRef.current;
       if (!s) return;
-      s.camera.zoom = Math.max(0.5, Math.min(3, s.camera.zoom * (e.deltaY > 0 ? 0.9 : 1.1)));
+      s.camera.zoomAt(e.clientX, e.clientY, e.deltaY);
     };
 
     canvas.addEventListener('mousedown',   onMouseDown);
@@ -410,6 +428,26 @@ export default function Mission({ onExit }) {
           if (!unit.alive || unit.layer === 'garrisoned' || unit.layer === 'subterrain') continue;
           unit.tickMovement(dt, g);
           unit.tickWeaponCooldowns(dt);
+          // Clear stale attack targets
+          if (unit.attackTarget) {
+            const tgt = ents.get(unit.attackTarget);
+            if (!tgt || !tgt.alive) unit.clearAttackTarget?.();
+          }
+
+          // Attack-move: auto-acquire nearest enemy within weapon range while moving
+          if (unit._data?.attackMove && unit.path.length > 0 && !unit.attackTarget && unit.weapons?.[0]) {
+            const weapDef = WEAPON_DEFS[unit.weapons[0]];
+            if (weapDef) {
+              const range = weapDef.range ?? 6;
+              const enemies = unit.faction === 'player' ? ents.getEnemyUnits() : ents.getPlayerUnits();
+              const inRange = enemies.find(e => e.alive && e.layer !== 'garrisoned' &&
+                Math.hypot(e.col - unit.col, e.row - unit.row) <= range);
+              if (inRange) {
+                unit.setAttackTarget(inRange.id);
+                unit.stopMoving(); // halt and fire
+              }
+            }
+          }
         }
 
         g.resetFogVisible();
@@ -419,6 +457,21 @@ export default function Mission({ onExit }) {
         s.combat.tick(dt);
         s.subterrain.tick(dt);
         s.trench.tick(dt);
+
+        // Tick player structure production queues
+        for (const st of ents.getPlayerStructures()) {
+          if (!st.alive) continue;
+          const completedDefId = st.tickProduction?.(dt);
+          if (completedDefId) {
+            const def = STRUCT_DEFS[completedDefId] ?? null;
+            if (def) {
+              const spawnCol = st.col + (st.footprint?.w ?? 2);
+              const spawnRow = st.row + (st.footprint?.h ?? 2);
+              s.spawner.spawnUnit(completedDefId, 'player', spawnCol, spawnRow);
+              eventBus.emit('unit_trained', { defId: completedDefId, faction: 'player' });
+            }
+          }
+        }
 
         // Simple enemy AI — fallback patrol + attack
         for (const enemy of ents.getEnemyUnits()) {
@@ -444,7 +497,9 @@ export default function Mission({ onExit }) {
           }
         }
 
+        s.enemyAI.tick(dt);
         s.director.tick(dt);
+        ents.pruneDeadEntities();
         s.resourceFields.tick(dt);
         s.oilDerrickSys.tick(dt);
         s.harvesterSys.tick(dt);
@@ -489,18 +544,41 @@ export default function Mission({ onExit }) {
 
       // Draw build placement preview
       if (buildModeRef.current && s.camera) {
-        // Highlight tile under cursor with a ghost overlay
         const ghostTile = s._cursorTile;
         if (ghostTile) {
-          const gscr = s.camera.tileToScreen(ghostTile.col, ghostTile.row);
+          const def = STRUCT_DEFS[buildModeRef.current];
+          const canAfford = s.buildSys.canAfford(def?.cost ?? 0);
+          const fw = def?.footprint?.w ?? 1;
+          const fh = def?.footprint?.h ?? 1;
           c.save();
-          c.globalAlpha = 0.4;
-          c.fillStyle = s.buildSys.canAfford(STRUCT_DEFS[buildModeRef.current]?.cost ?? 0) ? '#44ff44' : '#ff4444';
-          c.fillRect(gscr.x - 24, gscr.y - 16, 48, 32);
+          // Draw isometric diamond for each tile of the footprint
+          for (let dc = 0; dc < fw; dc++) {
+            for (let dr = 0; dr < fh; dr++) {
+              const gscr = s.camera.tileToScreen(ghostTile.col + dc, ghostTile.row + dr);
+              const hw = 64 * s.camera.zoom;
+              const hh = 32 * s.camera.zoom;
+              c.beginPath();
+              c.moveTo(gscr.x,      gscr.y - hh);
+              c.lineTo(gscr.x + hw, gscr.y     );
+              c.lineTo(gscr.x,      gscr.y + hh);
+              c.lineTo(gscr.x - hw, gscr.y     );
+              c.closePath();
+              c.globalAlpha = 0.35;
+              c.fillStyle = canAfford ? '#44ff44' : '#ff4444';
+              c.fill();
+              c.globalAlpha = 0.9;
+              c.strokeStyle = canAfford ? '#88ffaa' : '#ff8888';
+              c.lineWidth = 1.5;
+              c.stroke();
+            }
+          }
+          // Show cost label
+          const labelScr = s.camera.tileToScreen(ghostTile.col + fw/2 - 0.5, ghostTile.row + fh/2 - 0.5);
           c.globalAlpha = 1;
-          c.strokeStyle = '#ffffff';
-          c.lineWidth = 1;
-          c.strokeRect(gscr.x - 24, gscr.y - 16, 48, 32);
+          c.fillStyle = '#fff';
+          c.font = \`bold \${Math.round(11 * s.camera.zoom)}px monospace\`;
+          c.textAlign = 'center';
+          c.fillText(\`₢\${def?.cost ?? 0}\`, labelScr.x, labelScr.y);
           c.restore();
         }
       }
@@ -516,8 +594,17 @@ export default function Mission({ onExit }) {
 
     loop.start();
 
+    // ── Window resize ─────────────────────────────────────────────────────
+    const onResize = () => {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stateRef.current?.camera.resize(canvas.width, canvas.height);
+    };
+    window.addEventListener('resize', onResize);
+
     return () => {
       loop.stop();
+      window.removeEventListener('resize', onResize);
       window.removeEventListener('keydown',     onKeyDown);
       window.removeEventListener('keyup',       onKeyUp);
       canvas.removeEventListener('mousedown',   onMouseDown);
