@@ -576,9 +576,9 @@ export default function Mission({ onExit }) {
           const labelScr = s.camera.tileToScreen(ghostTile.col + fw/2 - 0.5, ghostTile.row + fh/2 - 0.5);
           c.globalAlpha = 1;
           c.fillStyle = '#fff';
-          c.font = \`bold \${Math.round(11 * s.camera.zoom)}px monospace\`;
+          c.font = `bold ${Math.round(11 * s.camera.zoom)}px monospace`;
           c.textAlign = 'center';
-          c.fillText(\`₢\${def?.cost ?? 0}\`, labelScr.x, labelScr.y);
+          c.fillText(`₢${def?.cost ?? 0}`, labelScr.x, labelScr.y);
           c.restore();
         }
       }
