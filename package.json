@@ -7,5 +7,9 @@
     "build": "mkdir -p dist && echo '<!doctype html><html><head><title>Driftgate RTS</title></head><body><div id=\"root\"></div></body></html>' > dist/index.html",
     "dev": "echo dev",
     "preview": "echo preview"
+  },
+  "dependencies": {
+    "@base44/sdk": "^0.8.41",
+    "@base44/vite-plugin": "^1.0.30"
   }
 }
