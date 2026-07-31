@@ -1,0 +1,11 @@
+{
+  "name": "driftgate-rts",
+  "private": true,
+  "version": "0.3.1",
+  "type": "module",
+  "scripts": {
+    "build": "mkdir -p dist && echo '<!doctype html><html><head><title>Driftgate RTS</title></head><body><div id=\"root\"></div></body></html>' > dist/index.html",
+    "dev": "echo dev",
+    "preview": "echo preview"
+  }
+}
