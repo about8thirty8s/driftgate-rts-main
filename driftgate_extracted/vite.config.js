@@ -5,6 +5,10 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
+  build: {
+    outDir: path.resolve(__dirname, '../dist'),
+    emptyOutDir: true,
+  },
   plugins: [react()],
   server: {
     allowedHosts: true
