@@ -1,9 +1,9 @@
 {
   "name": "Driftgate RTS",
   "site": {
-    "installCommand": "npm install",
-    "buildCommand": "npm run build",
-    "serveCommand": "npm run dev",
-    "outputDirectory": "./dist"
+    "installCommand": "cd driftgate_extracted && npm install",
+    "buildCommand": "cd driftgate_extracted && npm run build",
+    "serveCommand": "cd driftgate_extracted && npm run dev",
+    "outputDirectory": "./driftgate_extracted/dist"
   }
 }
