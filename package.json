@@ -4,8 +4,8 @@
   "version": "0.3.1",
   "type": "module",
   "scripts": {
-    "build": "cd driftgate_extracted && npm run build",
-    "dev": "cd driftgate_extracted && npm run dev",
+    "build": "cd driftgate_extracted && npm install && npm run build && cp -r dist ../dist",
+    "dev": "cd driftgate_extracted && npm install && npm run dev",
     "preview": "cd driftgate_extracted && npm run preview"
   },
   "dependencies": {
