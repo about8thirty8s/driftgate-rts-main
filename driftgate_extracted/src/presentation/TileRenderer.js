@@ -233,6 +233,40 @@ export class TileRenderer {
     }
     ctx.fill();
 
+    // Deterministic micro-texture breaks the flat coloured-diamond look while
+    // remaining stable across frames/replays. Marks stay inside the top face
+    // and align to the same 2:1 axes as roads, cliffs and structures.
+    if (!colours.animated && cam.zoom > 0.48) {
+      const seed = ((col * 73856093) ^ (row * 19349663)) >>> 0;
+      const marks = tile.type === 'ROAD' ? 2 : tile.type === 'CLIFF' ? 5 : 3;
+      ctx.save();
+      ctx.globalAlpha *= tile.type === 'JUNGLE_THICK' ? 0.18 : 0.11;
+      ctx.strokeStyle = colours.shadow;
+      ctx.lineWidth = Math.max(0.55, cam.zoom);
+      for (let i = 0; i < marks; i++) {
+        const a = ((seed >>> (i * 3)) & 31) / 31;
+        const b = ((seed >>> (i * 5 + 7)) & 31) / 31;
+        const px = sx + (a - b) * hw * 0.72;
+        const py = sy + (a + b) * hh * 0.72 + hh * 0.28;
+        const len = hw * (0.045 + (((seed >>> (i + 13)) & 7) / 110));
+        ctx.beginPath();
+        ctx.moveTo(px - len, py - len * 0.5);
+        ctx.lineTo(px + len, py + len * 0.5);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // A restrained north-edge highlight joins neighbouring tiles visually and
+    // gives the terrain authored strata without drawing a debug grid.
+    ctx.beginPath();
+    ctx.moveTo(sx - hw, sy + hh);
+    ctx.lineTo(sx, sy);
+    ctx.lineTo(sx + hw, sy + hh);
+    ctx.strokeStyle = 'rgba(255,232,187,0.055)';
+    ctx.lineWidth = Math.max(0.5, cam.zoom * 0.75);
+    ctx.stroke();
+
     // Left face (south-west)
     ctx.beginPath();
     ctx.moveTo(sx - hw, sy + hh              );

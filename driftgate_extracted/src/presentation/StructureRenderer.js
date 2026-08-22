@@ -516,12 +516,17 @@ export class StructureRenderer {
     const fw = structure.footprint?.w ?? 2;
     const fh = structure.footprint?.h ?? 2;
 
-    // Bottom-center anchor of the footprint diamond
-    const anchorX = sx + (fw - fh) * TILE_HW * cam.zoom * 0.5;
-    const anchorY = sy + (fw + fh) * TILE_HH * cam.zoom * 0.5;
+    // Ground contact is the SOUTH vertex of the complete isometric footprint.
+    // The previous renderer used the footprint centre and scaled by width only,
+    // which made rectangular buildings float, overlap lanes and appear to use a
+    // different camera. Keep every sprite locked to the same 2:1 projection.
+    const anchorX = sx + (fw - fh) * TILE_HW * cam.zoom;
+    const anchorY = sy + (fw + fh) * TILE_HH * cam.zoom;
 
-    // Scale sprite to footprint width
-    const targetW = fw * TILE_HW * cam.zoom * 2.8;
+    // The visible width of a w×h footprint in 2:1 dimetric projection is the
+    // sum of its axes. A small allowance keeps art anti-aliasing off the grid.
+    const footprintW = (fw + fh) * TILE_HW * cam.zoom;
+    const targetW = footprintW * 1.06;
     const scale   = targetW / img.naturalWidth;
     const drawW   = img.naturalWidth  * scale;
     const drawH   = img.naturalHeight * scale;
@@ -534,6 +539,19 @@ export class StructureRenderer {
     const hpFrac      = structure.hpFraction ?? (structure.hp / (structure.maxHp || 1));
 
     ctx.save();
+
+    // Contact shadow follows the actual footprint, not the sprite canvas.
+    // It visually seats transparent art and exposes bad pivots immediately.
+    ctx.globalAlpha = 0.24;
+    ctx.fillStyle = '#07100d';
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + fw * TILE_HW * cam.zoom, sy + fw * TILE_HH * cam.zoom);
+    ctx.lineTo(anchorX, anchorY);
+    ctx.lineTo(sx - fh * TILE_HW * cam.zoom, sy + fh * TILE_HH * cam.zoom);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
 
     // Construction: fade in as it builds
     if (structState === 'constructing') {
@@ -598,7 +616,11 @@ export class StructureRenderer {
       ctx.lineWidth   = 1.5;
       ctx.setLineDash([4, 3]);
       ctx.beginPath();
-      ctx.ellipse(anchorX, anchorY - 2, drawW * 0.48, drawW * 0.22, 0, 0, Math.PI * 2);
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + fw * TILE_HW * cam.zoom, sy + fw * TILE_HH * cam.zoom);
+      ctx.lineTo(anchorX, anchorY);
+      ctx.lineTo(sx - fh * TILE_HW * cam.zoom, sy + fh * TILE_HH * cam.zoom);
+      ctx.closePath();
       ctx.stroke();
       ctx.setLineDash([]);
     }
